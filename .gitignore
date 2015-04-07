@@ -40,6 +40,9 @@ local.properties
 *.suo
 *.user
 *.sln.docstates
+*.Rsuo
+*.Rsln
+*.rproj
 
 # Build results
 
