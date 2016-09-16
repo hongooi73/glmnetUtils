@@ -81,6 +81,7 @@ cv.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=N
     model$call <- match.call()
     model$terms <- terms(mf)
     model$sparse <- sparse
+    model$na.action <- attr(mf, "na.action")
     class(model) <- c("cv.glmnet.formula", class(model))
     model
 }

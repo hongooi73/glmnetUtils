@@ -134,8 +134,8 @@ cvAlpha.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, sub
     mf <- eval.parent(cl)
 
     x <- if(sparse)
-        dropIntercept(Matrix::sparse.model.matrix(formula, mf))
-    else dropIntercept(model.matrix(formula, mf))
+        dropIntercept(Matrix::sparse.model.matrix(attr(mf, "terms"), mf))
+    else dropIntercept(model.matrix(attr(mf, "terms"), mf))
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
@@ -146,6 +146,7 @@ cvAlpha.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, sub
     model$call <- match.call()
     model$terms <- terms(mf)
     model$sparse <- sparse
+    model$na.action <- attr(mf, "na.action")
     class(model) <- c("cvAlpha.glmnet.formula", class(model))
     model
 }
@@ -194,9 +195,10 @@ predict.cvAlpha.glmnet <- function(object, newx, alpha, which=match(TRUE, abs(ob
 #' @rdname predict.cvAlpha.glmnet
 #' @export
 predict.cvAlpha.glmnet.formula <- function(object, newdata, alpha, which=match(TRUE, abs(object$alpha - alpha) < 1e-8),
-                                           ...)
+                                           na.action=na.pass, ...)
 {
     tt <- delete.response(object$terms)
+    newdata <- model.frame(tt, newdata, na.action=na.action)
     newx <- if(object$sparse)
         dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
     else dropIntercept(model.matrix(tt, newdata))
