@@ -57,17 +57,17 @@ glmnet::glmnet(x, ...)
 #' @rdname glmnet
 #' @method glmnet formula
 #' @export
-glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL, na.action=na.omit,
+glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL, na.action=getOption("na.action"),
                            drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE)
 {
     cl <- match.call(expand=FALSE)
-    cl$... <- cl$sparse <- NULL
+    cl$`...` <- cl$sparse <- NULL
     cl[[1]] <- quote(stats::model.frame)
     mf <- eval.parent(cl)
 
     x <- if(sparse)
-        Matrix::sparse.model.matrix(formula, mf)[, -1]
-    else model.matrix(formula, mf)[, -1]
+        Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1]
+    else model.matrix(attr(mf, "terms"), mf)[, -1]
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
@@ -78,6 +78,7 @@ glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL
     model$call <- match.call()
     model$terms <- terms(mf)
     model$sparse <- sparse
+    model$na.action <- attr(mf, "na.action")
     class(model) <- c("glmnet.formula", class(model))
     model
 }
@@ -88,7 +89,7 @@ glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL
 #' @rdname glmnet
 #' @export
 #' @method predict glmnet.formula
-predict.glmnet.formula <- function(object, newdata, ...)
+predict.glmnet.formula <- function(object, newdata, na.action=na.exclude, ...)
 {
     if(!inherits(object, "glmnet.formula"))
         stop("invalid glmnet.formula object")

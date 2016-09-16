@@ -61,13 +61,13 @@ cv.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=N
                               drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE)
 {
     cl <- match.call(expand=FALSE)
-    cl$... <- cl$sparse <- NULL
+    cl$`...` <- cl$sparse <- NULL
     cl[[1]] <- quote(stats::model.frame)
     mf <- eval.parent(cl)
 
     x <- if(sparse)
-        Matrix::sparse.model.matrix(formula, mf)[, -1]
-    else model.matrix(formula, mf)[, -1]
+        Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1]
+    else model.matrix(attr(mf, "terms"), mf)[, -1]
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
