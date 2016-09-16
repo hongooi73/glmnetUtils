@@ -1,13 +1,22 @@
 Package: glmnetUtils
 Type: Package
 Title: Utilities for glmnet
-Depends: glmnet
-Imports: parallel, Matrix
-Version: 0.3
-Date: 2015-04-01
-Author: Revolution Analytics [aut], Hong Ooi [aut, cre]
-Maintainer: Hong Ooi <hong.ooi@revolutionanalytics.com>
+Depends:
+    glmnet
+Imports:
+    parallel,
+    Matrix
+Version: 0.4
+Date: 2016-09-16
+Author: Microsoft [aut], Hong Ooi [aut, cre]
+Maintainer: Hong Ooi <hongooi@microsoft.com>
 Description: Utilities for glmnet
 NeedsCompilation: no
-Copyright: Revolution Analytics
+Copyright: Microsoft
 License: GPL-2
+Collate:
+    'glmnetUtils.r'
+    'cvAlpha.r'
+    'cvGlmnetFormula.r'
+    'glmnetFormula.r'
+RoxygenNote: 5.0.1

@@ -90,7 +90,7 @@ cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, .
 #' @param weights An optional vector of case weights to be used in the fitting process. If missing, defaults to an unweighted fit.
 #' @param offset An optional vector of offsets, an \emph{a priori} known component to be included in the linear predictor.
 #' @param subset An optional vector specifying the subset of observations to be used to fit the model.
-#' @param na.action A function which indicates what should happen when the data contain \code{NA}s.
+#' @param na.action A function which indicates what should happen when the data contains missing values. For the \code{predict} method, \code{na.action = na.pass} will predict missing values with \code{NA}; \code{na.omit} or \code{na.exclude} will drop them.
 #' @param drop.unused.levels Should factors have unused levels dropped? Defaults to \code{FALSE}.
 #' @param xlev A named list of character vectors giving the full set of levels to be assumed for each factor.
 #' @param sparse Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).
