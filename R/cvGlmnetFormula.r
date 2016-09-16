@@ -1,3 +1,6 @@
+#' @include glmnetUtils.r
+NULL
+
 #' @name cv.glmnet
 #' @export
 cv.glmnet <- function(x, ...)
@@ -57,7 +60,7 @@ glmnet::cv.glmnet(x, ...)
 #' @rdname cv.glmnet
 #' @method cv.glmnet formula
 #' @export
-cv.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL, na.action=na.omit,
+cv.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL, na.action=getOption("na.action"),
                               drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE)
 {
     cl <- match.call(expand=FALSE)
@@ -66,8 +69,8 @@ cv.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=N
     mf <- eval.parent(cl)
 
     x <- if(sparse)
-        Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1]
-    else model.matrix(attr(mf, "terms"), mf)[, -1]
+        dropIntercept(Matrix::sparse.model.matrix(attr(mf, "terms"), mf))
+    else dropIntercept(model.matrix(attr(mf, "terms"), mf))
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
@@ -88,14 +91,15 @@ cv.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=N
 #' @rdname cv.glmnet
 #' @method predict cv.glmnet.formula
 #' @export
-predict.cv.glmnet.formula <- function(object, newdata, ...)
+predict.cv.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
 {
     if(!inherits(object, "cv.glmnet.formula"))
         stop("invalid cv.glmnet.formula object")
     tt <- delete.response(object$terms)
+    newdata <- model.frame(tt, newdata, na.action=na.action)
     x <- if(object$sparse)
-        Matrix::sparse.model.matrix(tt, newdata)[, -1]
-    else model.matrix(tt, newdata)[, -1]
+        dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
+    else dropIntercept(model.matrix(tt, newdata))
     class(object) <- class(object)[-1]
     predict(object, x, ...)
 }

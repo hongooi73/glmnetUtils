@@ -14,3 +14,11 @@
 #' @name glmnetUtils
 #' @aliases glmnetUtils-package
 NULL
+
+
+dropIntercept <- function(matr)
+{
+    if(!is.matrix(matr))
+        matr <- as.matrix(matr)
+    matr[, -1, drop=FALSE]
+}

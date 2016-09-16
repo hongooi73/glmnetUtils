@@ -1,3 +1,6 @@
+#' @include glmnetUtils.r
+NULL
+
 #' @name glmnet
 #' @export
 glmnet <- function(x, ...)
@@ -66,8 +69,8 @@ glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL
     mf <- eval.parent(cl)
 
     x <- if(sparse)
-        Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1]
-    else model.matrix(attr(mf, "terms"), mf)[, -1]
+        dropIntercept(Matrix::sparse.model.matrix(attr(mf, "terms"), mf))
+    else dropIntercept(model.matrix(attr(mf, "terms"), mf))
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
@@ -89,14 +92,15 @@ glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL
 #' @rdname glmnet
 #' @export
 #' @method predict glmnet.formula
-predict.glmnet.formula <- function(object, newdata, na.action=na.exclude, ...)
+predict.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
 {
     if(!inherits(object, "glmnet.formula"))
         stop("invalid glmnet.formula object")
     tt <- delete.response(object$terms)
+    newdata <- model.frame(tt, newdata, na.action=na.action)
     x <- if(object$sparse)
-        Matrix::sparse.model.matrix(tt, newdata)[, -1]
-    else model.matrix(tt, newdata)[, -1]
+        dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
+    else dropIntercept(model.matrix(tt, newdata))
     class(object) <- class(object)[-1]
     predict(object, x, ...)
 }
