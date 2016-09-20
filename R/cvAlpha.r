@@ -8,10 +8,9 @@ UseMethod("cvAlpha.glmnet")
 
 #' Do elastic net cross-validation for alpha and lambda simultaneously
 #'
-#' @param x A matrix of predictor variables.
+#' @param x A matrix of predictor variables; or for the plotting methods, an object returned by \code{cvAlpha.glmnet}.
 #' @param y A response vector or matrix (for a multinomial response).
-#' @param alpha A vector of alpha values for which to do cross-validation. The default is a sequence of 11 values more closely spaced around alpha = 0.
-#' @param ... Other arguments to be passed to \code{cv.glmnet}.
+#' @param alpha A vector of alpha values for which to do cross-validation. The default is a sequence of 11 values more closely spaced around alpha = 0. For the \code{predict} and \code{coef} methods, the specific value of alpha for which to return predictions/regression coefficients.
 #' @param nfolds The number of cross-validation folds to use. Defaults to 10.
 #' @param outerParallel Method of parallelising the outer loop over alpha. See 'Details' below. If \code{NULL}, the loop is run sequentially.
 #' @param checkInnerParallel If the outer loop is run in parallel, check that the inner loop over lambda will not be in contention for cores.
@@ -22,7 +21,7 @@ UseMethod("cvAlpha.glmnet")
 #' Optionally this loop over alpha can be parallelised; currently, \code{cvAlpha.glmnet} knows about two methods of doing so:
 #' \itemize{
 #'   \item Via \code{\link{parLapply}} in the \code{parallel} package. To use this, set \code{outerParallel} to a valid cluster object created by \code{\link{makeCluster}}.
-#'   \item Via \code{\link{rxExec}} as supplied by Revolution Analytics' \code{RevoScaleR} package. To use this, set \code{outerParallel} to a valid compute context created by \code{\link{RxComputeContext}}, or a character string specifying such a context.
+#'   \item Via \code{\link{rxExec}} as supplied by Microsoft R Server's \code{RevoScaleR} package. To use this, set \code{outerParallel} to a valid compute context created by \code{\link{RxComputeContext}}, or a character string specifying such a context.
 #' }
 #' If the outer loop is run in parallel, \code{cvAlpha.glmnet} can check if the inner loop (over lambda) is also set to run in parallel, and disable this if it would lead to contention for cores. This is done if it is likely that the parallelisation is local on a multicore machine, ie if \code{outerParallel} is a \code{SOCKcluster} object running on \code{"localhost"}, or if the supplied compute context is local parallel.
 #'
@@ -52,9 +51,9 @@ cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, .
     foldid <- sample(nfolds, nrow(x), replace=TRUE)
     dotargs <- list(...)
 
-    rxContexts <- c("RxLocalSeq", "local", "RxLocalParallel", "localpar", "RxHadoopMR", "hadoopmr",
-                    "RxInTeradata", "teradata", "RxLsfCluster", "lsf", "RxHpcServer", "mshpc",
-                    "RxForeachDoPar", "dopar")
+    # do not explicitly import RevoScaleR; this allows use with non-Microsoft R installs
+    rxContexts <- c("RxLocalSeq", "local", "RxLocalParallel", "localpar", "RxHadoopMR", "hadoopmr", "RxSpark", "spark",
+                    "RxInTeradata", "teradata", "RxForeachDoPar", "dopar", "RxInSqlServer", "sqlserver")
     if(is.character(outerParallel) && (outerParallel %in% rxContexts) && require(RevoScaleR))
         outerParallel <- RevoScaleR::RxComputeContext(outerParallel)
 
@@ -111,7 +110,8 @@ cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, .
 #' Fundamental to R's handling of formulas, model frames and model matrices is a \code{\link{terms}} object, which encodes how variables and their interactions (if any) are organised. One of the attributes of this object is a matrix with one row per variable, and one column per main effect and interaction. Thus, at minimum, this is (approximately) a \eqn{p \times p}{p x p} square matrix where \eqn{p} is the number of main effects in the model. When \eqn{p ~ 16000}, this matrix will be about a gigabyte in size. Because of this, you should use the formula interface with caution when working with wide datasets and limited memory.
 #'
 #' @examples
-#' cvAlpha.glmnet(mpg ~ ., data=mtcars)
+#' cva <- cvAlpha.glmnet(mpg ~ ., data=mtcars)
+#' predict(cva, mtcars, alpha=1)
 #'
 #' \dontrun{
 #'
@@ -120,7 +120,8 @@ cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, .
 #'               "Leukemia.RData")
 #' load("Leukemia.Rdata")
 #' leuk <- do.call(data.frame, Leukemia)
-#' cvAlpha.glmnet(y ~ ., leuk, family="binomial")
+#' leuk.cva <- cvAlpha.glmnet(y ~ ., leuk, family="binomial")
+#' leuk.pred <- predict(leuk.cva, leuk, which=6)
 #' }
 #' @rdname cvAlpha.glmnet
 #' @method cvAlpha.glmnet formula
@@ -152,12 +153,10 @@ cvAlpha.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, sub
 }
 
 
-#' Get predictions from a crossvalidated cvAlpha.glmnet object
-#' @param object An object of class \code{cvAlpha.glmnet}, or which inherits from it.
-#' @param newx A matrix of predictor variables.
-#' @param alpha The value of alpha at which to compute predictions. This must match with the values of alpha supplied to \code{cvAlpha.glmnet}.
+#' @param object For the \code{predict} and \code{coef} methods, an object returned by \code{cvAlpha.glmnet}.
+#' @param newx For the \code{predict} method, a matrix of predictor variables.
 #' @param which An alternative way of specifying alpha; the index number of the desired value within the alpha vector. If both \code{which} and \code{alpha} are supplied, the former takes precedence.
-#' @param ... Further arguments to be passed to \code{glmnet:::predict.cv.glmnet}.
+#' @param ... Further arguments to be passed to lower-level functions. In the case of \code{cvAlpha.glmnet}, these arguments are passed to \code{cv.glmnet}; for \code{predict} and \code{coef}, they are passed to \code{predict.cv.glmnet}; and for \code{plot} and \code{plotLambda}, to \code{plot}.
 #'
 #' @details
 #' The \code{predict} method computes predictions for a specific alpha value given a \code{cvAlpha.glmnet} object. It looks up the supplied alpha (possibly supplied indirectly via the \code{which} argument) in the object's stored \code{alpha} vector, and calls \code{glmnet:::predict.cv.glmnet} on the corresponding \code{cv.glmnet} fit. All the arguments to that function are (or should be) supported.
@@ -166,6 +165,7 @@ cvAlpha.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, sub
 #' \code{\link[glmnet:predict.cv.glmnet]{glmnet:::predict.cv.glmnet}}, \code{\link[glmnet:coef.cv.glmnet]{glmnet:::coef.cv.glmnet}}
 #'
 #' @method predict cvAlpha.glmnet
+#' @rdname cvAlpha.glmnet
 #' @export
 predict.cvAlpha.glmnet <- function(object, newx, alpha, which=match(TRUE, abs(object$alpha - alpha) < 1e-8), ...)
 {
@@ -176,23 +176,13 @@ predict.cvAlpha.glmnet <- function(object, newx, alpha, which=match(TRUE, abs(ob
 }
 
 
-#' @param newdata A data frame containing the observations for which to calculate predictions.
+#' @param newdata For the \code{predict} and \code{coef} methods, a data frame containing the observations for which to calculate predictions.
 #'
-#' @examples
-#' predict(cvAlpha.glmnet(mpg ~ ., data=mtcars), mtcars, alpha=1)
+#' @section Value:
+#' For the \code{predict} method, a vector or matrix of predicted values.
 #'
-#' \dontrun{
-#'
-#' # Leukemia example dataset from Trevor Hastie's website
-#' download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
-#'               "Leukemia.RData")
-#' load("Leukemia.Rdata")
-#' leuk <- do.call(data.frame, Leukemia)
-#' leuk.cva <- cvAlpha.glmnet(y ~ ., leuk, family="binomial")
-#' pred <- predict(leuk.cva, leuk, which=6)
-#' }
 #' @method predict cvAlpha.glmnet.formula
-#' @rdname predict.cvAlpha.glmnet
+#' @rdname cvAlpha.glmnet
 #' @export
 predict.cvAlpha.glmnet.formula <- function(object, newdata, alpha, which=match(TRUE, abs(object$alpha - alpha) < 1e-8),
                                            na.action=na.pass, ...)
@@ -208,8 +198,12 @@ predict.cvAlpha.glmnet.formula <- function(object, newdata, alpha, which=match(T
 
 #' @details
 #' The \code{coef} method is similar, returning the coefficients for the selected alpha value via \code{glmnet:::coef.cv.glmnet}.
+#'
+#' @section Value:
+#' For the \code{coef} method, a vector of regularised regression coefficients.
+#'
 #' @method coef cvAlpha.glmnet
-#' @rdname predict.cvAlpha.glmnet
+#' @rdname cvAlpha.glmnet
 #' @export
 coef.cvAlpha.glmnet <- function(object, alpha, which=match(TRUE, abs(object$alpha - alpha) < 1e-8), ...)
 {
@@ -220,16 +214,13 @@ coef.cvAlpha.glmnet <- function(object, alpha, which=match(TRUE, abs(object$alph
 }
 
 
-#' Plot the elastic net cross-validation results by alpha and lambda
-#' @param x An object of class \code{cvAlpha.glmnet}.
-#' @param ... Other arguments to be passed to \code{plot}.
-#'
 #' @details
 #' The plot method for \code{cvAlpha.glmnet} objects plots the average cross-validated loss by lambda, for each value of alpha. Each line represents one \code{cv.glmnet} fit, corresponding to one value of alpha. Note that the specific lambda values can vary substantially by alpha, hence no attempt is made to put them on a common scale. Instead, the lines are simply the cross-validated loss results in sequential order, with the smallest lambda values for each fit on the left.
 #'
 #' @seealso
 #' \code{\link{cvAlpha.glmnet}}, \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}}, \code{\link{plot}}
 #' @method plot cvAlpha.glmnet
+#' @rdname cvAlpha.glmnet
 #' @export
 plot.cvAlpha.glmnet <- function(x, ...)
 {
@@ -247,7 +238,7 @@ plot.cvAlpha.glmnet <- function(x, ...)
 
 #' @details
 #' The \code{plotLambda} function gives the best (lowest) cross-validated loss for each value of alpha.
-#' @rdname plot.cvAlpha.glmnet
+#' @rdname cvAlpha.glmnet
 #' @export
 plotLambda <- function(x, ...)
 {
