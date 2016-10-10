@@ -25,6 +25,7 @@ glmnet::glmnet(x, ...)
 #' @param drop.unused.levels Should factors have unused levels dropped? Defaults to \code{FALSE}.
 #' @param xlev A named list of character vectors giving the full set of levels to be assumed for each factor.
 #' @param sparse Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).
+#' @param use.model.frame Should the base R \code{model.frame} function be used? This is the standard method that most R modelling functions use.
 #' @param ... For \code{glmnet.formula} and \code{glmnet.default}, other arguments to be passed to \code{\link[glmnet:glmnet]{glmnet::glmnet}}; for the \code{predict} and \code{coef} methods, arguments to be passed to their counterparts in package \code{glmnet}.
 #'
 #' @details
@@ -60,28 +61,21 @@ glmnet::glmnet(x, ...)
 #' @rdname glmnet
 #' @method glmnet formula
 #' @export
-glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL, na.action=getOption("na.action"),
-                           drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE)
+glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
+                           drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, use.model.frame=FALSE)
 {
-    cl <- match.call(expand=FALSE)
-    cl$`...` <- cl$sparse <- NULL
-    cl[[1]] <- quote(stats::model.frame)
-    mf <- eval.parent(cl)
+    xyFunc <- if(use.model.frame)
+        makeModelComponentsMF
+    else makeModelComponents
+    xy <- xyFunc(formula, data, weights=weights, offset=offset, subset=subset, na.action=na.action,
+                 drop.unused.levels=drop.unused.levels, xlev=xlev, sparse=sparse)
 
-    x <- if(sparse)
-        dropIntercept(Matrix::sparse.model.matrix(attr(mf, "terms"), mf))
-    else dropIntercept(model.matrix(attr(mf, "terms"), mf))
-    y <- model.response(mf)
-    weights <- model.extract(mf, "weights")
-    offset <- model.extract(mf, "offset")
-    if(is.null(weights))
-        weights <- rep(1, length(y))
-
-    model <- glmnet::glmnet(x, y, weights=weights, offset=offset, ...)
+    model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, ...)
     model$call <- match.call()
-    model$terms <- terms(mf)
+    model$terms <- xy$terms
     model$sparse <- sparse
-    model$na.action <- attr(mf, "na.action")
+    model$use.model.frame <- use.model.frame
+    model$na.action <- na.action
     class(model) <- c("glmnet.formula", class(model))
     model
 }
@@ -96,11 +90,21 @@ predict.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
 {
     if(!inherits(object, "glmnet.formula"))
         stop("invalid glmnet.formula object")
-    tt <- delete.response(object$terms)
-    newdata <- model.frame(tt, newdata, na.action=na.action)
-    x <- if(object$sparse)
-        dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
-    else dropIntercept(model.matrix(tt, newdata))
+
+    if(object$use.model.frame)
+    {
+        tt <- delete.response(object$terms)
+        newdata <- model.frame(tt, newdata, na.action=na.action)
+        x <- if(object$sparse)
+            dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
+        else dropIntercept(model.matrix(tt, newdata))
+    }
+    else
+    {
+        rhs <- object$terms
+        x <- makeModelComponents(rhs, newdata, na.action=na.action)$x
+    }
+
     class(object) <- class(object)[-1]
     predict(object, x, ...)
 }

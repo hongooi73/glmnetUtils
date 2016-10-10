@@ -18,7 +18,8 @@ cvAlpha.glmnet(x, ...)
 
 \method{cvAlpha.glmnet}{formula}(formula, data, ..., weights, offset = NULL,
   subset = NULL, na.action = getOption("na.action"),
-  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE)
+  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
+  use.model.frame = FALSE)
 
 \method{predict}{cvAlpha.glmnet}(object, newx, alpha, which = match(TRUE,
   abs(object$alpha - alpha) < 1e-08), ...)

@@ -14,7 +14,8 @@ cv.glmnet(x, ...)
 
 \method{cv.glmnet}{formula}(formula, data, ..., weights, offset = NULL,
   subset = NULL, na.action = getOption("na.action"),
-  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE)
+  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
+  use.model.frame = FALSE)
 
 \method{predict}{cv.glmnet.formula}(object, newdata, na.action = na.pass, ...)
 

@@ -12,9 +12,10 @@ glmnet(x, ...)
 
 \method{glmnet}{default}(x, ...)
 
-\method{glmnet}{formula}(formula, data, ..., weights, offset = NULL,
+\method{glmnet}{formula}(formula, data, ..., weights = NULL, offset = NULL,
   subset = NULL, na.action = getOption("na.action"),
-  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE)
+  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
+  use.model.frame = FALSE)
 
 \method{predict}{glmnet.formula}(object, newdata, na.action = na.pass, ...)
 
@@ -42,6 +43,8 @@ glmnet(x, ...)
 \item{xlev}{A named list of character vectors giving the full set of levels to be assumed for each factor.}
 
 \item{sparse}{Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).}
+
+\item{use.model.frame}{Should the base R \code{model.frame} function be used? This is the standard method that most R modelling functions use.}
 
 \item{object}{For the \code{predict} and \code{coef} methods, an object of class \code{glmnet.formula}.}
 
