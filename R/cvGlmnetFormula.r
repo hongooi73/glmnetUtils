@@ -25,6 +25,7 @@ glmnet::cv.glmnet(x, ...)
 #' @param drop.unused.levels Should factors have unused levels dropped? Defaults to \code{FALSE}.
 #' @param xlev A named list of character vectors giving the full set of levels to be assumed for each factor.
 #' @param sparse Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).
+#' @param use.model.frame Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link{discussion}.
 #' @param ... For \code{cv.glmnet.formula} and \code{cv.glmnet.default}, other arguments to be passed to \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}}; for the \code{predict} and \code{coef} methods, arguments to be passed to their counterparts in package \code{glmnet}.
 #'
 #' @details

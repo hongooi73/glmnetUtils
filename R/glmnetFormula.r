@@ -25,7 +25,7 @@ glmnet::glmnet(x, ...)
 #' @param drop.unused.levels Should factors have unused levels dropped? Defaults to \code{FALSE}.
 #' @param xlev A named list of character vectors giving the full set of levels to be assumed for each factor.
 #' @param sparse Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).
-#' @param use.model.frame Should the base R \code{model.frame} function be used? This is the standard method that most R modelling functions use.
+#' @param use.model.frame Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link{discussion}.
 #' @param ... For \code{glmnet.formula} and \code{glmnet.default}, other arguments to be passed to \code{\link[glmnet:glmnet]{glmnet::glmnet}}; for the \code{predict} and \code{coef} methods, arguments to be passed to their counterparts in package \code{glmnet}.
 #'
 #' @details
@@ -37,9 +37,6 @@ glmnet::glmnet(x, ...)
 #'
 #' @section Value:
 #' For \code{glmnet.formula}, an object of class \code{glmnet.formula}. This is basically the same object created by \code{glmnet::glmnet}, but with extra components to allow formula usage.
-#'
-#' @section Warning:
-#' Fundamental to R's handling of formulas, model frames and model matrices is a \code{\link{terms}} object, which encodes how variables and their interactions (if any) are organised. One of the attributes of this object is a matrix with one row per variable, and one column per main effect and interaction. Thus, at minimum, this is (approximately) a \eqn{p \times p}{p x p} square matrix where \eqn{p} is the number of main effects in the model. When \eqn{p ~ 16000}, this matrix will be about a gigabyte in size. Because of this, you should use the formula interface with caution when working with wide datasets and limited memory.
 #'
 #' @seealso
 #' \code{\link[glmnet:glmnet]{glmnet::glmnet}}, \code{\link[glmnet:predict.glmnet]{glmnet:::predict.glmnet}}, \code{\link[glmnet:coef.glmnet]{glmnet:::coef.glmnet}}, \code{\link{model.frame}}, \code{\link{model.matrix}}

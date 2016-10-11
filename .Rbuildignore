@@ -1,2 +1,4 @@
 ^.*\.rxproj$
 ^.*\.sln$
+^.*\.rproj$
+^.*\.tss$
