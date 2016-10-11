@@ -86,7 +86,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     }
 
     if(!is.function(na.action))
-        na.action <- getFunction(na.action)
+        na.action <- get(na.action, mode="function")
     data <- na.action(data[c(lhsVars, rhsVars)])
 
     matrs <- sapply(rhsVars, function(x) {
@@ -101,6 +101,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
     # cut-down version of real terms object: just a formula
     terms <- do.call("~", list(rhs))
+    environment(terms) <- NULL  # ensure we don't save tons of crap by accident
 
     offset <- substitute(offset)
     offset <- eval(offset, data, parent.frame())
