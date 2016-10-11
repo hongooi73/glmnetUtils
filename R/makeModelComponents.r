@@ -12,7 +12,7 @@
 #'
 #' The major disadvantage of using \code{model.frame} is that it generates a \code{\link{terms}} object, which encodes how variables and interactions are organised. One of the attributes of this object is a matrix with one row per variable, and one column per main effect and interaction. At minimum, this is (approximately) a \eqn{p \times p}{p x p} square matrix where \eqn{p} is the number of main effects in the model. For wide datasets with \eqn{p > 10000}, this matrix can approach or exceed a gigabyte in size. Even if there is enough memory to store such an object, generating it can take a significant amount of time.
 #'
-#' Another issue with the standard R approach is the treatment of factors. Normally, \code{model.matrix} will turn an \eqn{N}-level factor into an indicator matrix with \eqn{N-1} columns, with one column being dropped. This is necessary for unregularised linear models as fit with \code{lm} and \code{glm}, since the full set of \eqn{N} columns is linearly dependent. With the usual \link{contr.treatment}[treatment contrasts], the interpretation is that the dropped column represents a baseline level, while the coefficients for the other columns represent the difference in the response relative to the baseline.
+#' Another issue with the standard R approach is the treatment of factors. Normally, \code{model.matrix} will turn an \eqn{N}-level factor into an indicator matrix with \eqn{N-1} columns, with one column being dropped. This is necessary for unregularised linear models as fit with \code{lm} and \code{glm}, since the full set of \eqn{N} columns is linearly dependent. With the usual \link[=treatment contrasts]{contr.treatment}, the interpretation is that the dropped column represents a baseline level, while the coefficients for the other columns represent the difference in the response relative to the baseline.
 #'
 #' This may not be appropriate for a regularised model as fit with glmnet. The regularisation procedure shrinks the coefficients towards zero, which forces the estimated differences from the baseline to be smaller. But this only makes sense if the baseline level was chosen beforehand, or is otherwise meaningful as a default; otherwise it is effectively making the levels more similar to an arbitrarily chosen level.
 #'
@@ -23,14 +23,6 @@
 NULL
 
 
-dropIntercept <- function(matr)
-{
-    if(!is.matrix(matr))
-        matr <- as.matrix(matr)
-    matr[, -1, drop=FALSE]
-}
-
-
 #' @importFrom Matrix sparse.model.matrix
 # short, simple function that unavoidably creates a pxp square matrix (!)
 makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
@@ -39,8 +31,8 @@ makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subs
     mf <- model.frame(formula, data, weights=weights, offset=offset, subset=subset, na.action=na.action,
                       drop.unused.levels=drop.unused.levels, xlev=xlev)
     x <- if(sparse)
-        dropIntercept(Matrix::sparse.model.matrix(attr(mf, "terms"), mf))
-    else dropIntercept(model.matrix(attr(mf, "terms"), mf))
+        Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1, drop=FALSE]
+    else model.matrix(attr(mf, "terms"), mf)[, -1, drop=FALSE]
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")

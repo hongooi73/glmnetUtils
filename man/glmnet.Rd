@@ -44,7 +44,7 @@ glmnet(x, ...)
 
 \item{sparse}{Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).}
 
-\item{use.model.frame}{Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link{discussion}.}
+\item{use.model.frame}{Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
 
 \item{object}{For the \code{predict} and \code{coef} methods, an object of class \code{glmnet.formula}.}
 

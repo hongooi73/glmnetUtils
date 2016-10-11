@@ -44,7 +44,7 @@ cv.glmnet(x, ...)
 
 \item{sparse}{Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).}
 
-\item{use.model.frame}{Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link{discussion}.}
+\item{use.model.frame}{Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
 
 \item{object}{For the \code{predict} and \code{coef} methods, an object of class \code{cv.glmnet.formula}.}
 
@@ -62,10 +62,6 @@ The \code{cv.glmnet} function in this package is an S3 generic with a formula an
 The code works in a similar manner to \code{lm}, \code{glm} and other modelling functions. The arguments are used to generate a \emph{model frame}, which is a data frame augmented with information about the roles the columns play in fitting the model. This is then turned into a \emph{model matrix} and a response vector, which are passed to \code{glmnet::glmnet} along with any arguments in \code{...}. If \code{sparse} is TRUE, then \code{Matrix::sparse.model.matrix} is used instead of \code{stats::model.matrix} to create the model matrix.
 
 The \code{predict} and \code{coef} methods are wrappers for the corresponding methods in the \code{glmnet} package. The former constructs a predictor model matrix from its \code{newdata} argument and passes that as the \code{newx} argument to \code{glmnet:::predict.cv.glmnet}.
-}
-\section{Warning}{
-
-Fundamental to R's handling of formulas, model frames and model matrices is a \code{\link{terms}} object, which encodes how variables and their interactions (if any) are organised. One of the attributes of this object is a matrix with one row per variable, and one column per main effect and interaction. Thus, at minimum, this is (approximately) a \eqn{p \times p}{p x p} square matrix where \eqn{p} is the number of main effects in the model. When \eqn{p ~ 16000}, this matrix will be about a gigabyte in size. Because of this, you should use the formula interface with caution when working with wide datasets and limited memory.
 }
 \examples{
 cv.glmnet(mpg ~ ., data=mtcars)

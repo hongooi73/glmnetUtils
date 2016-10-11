@@ -68,7 +68,7 @@ plotLambda(x, ...)
 
 \item{sparse}{Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).}
 
-\item{use.model.frame}{Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link{discussion}.}
+\item{use.model.frame}{Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
 
 \item{object}{For the \code{predict} and \code{coef} methods, an object returned by \code{cvAlpha.glmnet}.}
 
@@ -116,11 +116,6 @@ For the \code{predict} method, a vector or matrix of predicted values.
 
 
 For the \code{coef} method, a vector of regularised regression coefficients.
-}
-
-\section{Warning}{
-
-Fundamental to R's handling of formulas, model frames and model matrices is a \code{\link{terms}} object, which encodes how variables and their interactions (if any) are organised. One of the attributes of this object is a matrix with one row per variable, and one column per main effect and interaction. Thus, at minimum, this is (approximately) a \eqn{p \times p}{p x p} square matrix where \eqn{p} is the number of main effects in the model. When \eqn{p ~ 16000}, this matrix will be about a gigabyte in size. Because of this, you should use the formula interface with caution when working with wide datasets and limited memory.
 }
 \examples{
 cva <- cvAlpha.glmnet(mpg ~ ., data=mtcars)
