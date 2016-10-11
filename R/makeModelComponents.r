@@ -25,15 +25,12 @@ NULL
 
 #' @importFrom Matrix sparse.model.matrix
 # short, simple function that unavoidably creates a pxp square matrix (!)
-makeModelComponentsMF <- function(..., sparse=FALSE)
+makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
+                                  drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, ...)
 {
-    # horrible NSE hackery
-    cl <- match.call(expand=TRUE)
-    cl$sparse <- NULL
-    cl[-1] <- lapply(cl[-1], function(x) {
-        subs <- substitute(substitute(.x), list(.x=x))
-        eval(subs, parent.frame(3))
-    })
+    # more NSE hackery
+    cl <- match.call(expand.dots=FALSE)
+    cl$sparse <- cl$`...` <- NULL
     cl[[1]] <- quote(stats::model.frame)
     mf <- eval(cl)
 
@@ -52,7 +49,7 @@ makeModelComponentsMF <- function(..., sparse=FALSE)
 
 # emulate model.frame + model.matrix, without constructing a terms object
 makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
-                                drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE)
+                                drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, ...)
 {
     if(length(formula) == 3)
     {
@@ -78,10 +75,11 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     if(!setequal(c("+", rhsVars), c("+", rhsNames)))
         stop("only simple formulas allowed")
 
-    if(!missing(subset) && !is.null(subset))
+    if(!missing(subset))
     {
         subset <- substitute(subset)
-        data <- eval(subset, data, parent.frame())
+        if(!is.null(subset))
+            data <- data[eval(subset, data, parent.frame()), , drop=FALSE]
     }
 
     if(!is.function(na.action))
@@ -104,12 +102,11 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
     offset <- substitute(offset)
     offset <- eval(offset, data, parent.frame())
-    if(!missing(weights) && !is.null(weights))
-    {
-        weights <- substitute(weights)
+
+    if(!missing(weights) && !is.null(weights <- substitute(weights)))
         weights <- eval(weights, data, parent.frame())
-    }
     else weights <- rep(1, nrow(data))
+
 
     list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weights, offset=offset, terms=terms)
 }

@@ -129,11 +129,12 @@ cvAlpha.glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL
                                    na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL, 
                                    sparse=FALSE, use.model.frame=FALSE)
 {
-    xyFunc <- if(use.model.frame)
+    # must use NSE to get model.frame emulation to work
+    cl <- match.call(expand.dots=FALSE)
+    cl[[1]] <- if(use.model.frame)
         makeModelComponentsMF
     else makeModelComponents
-    xy <- xyFunc(formula, data, weights=weights, offset=offset, subset=subset, na.action=na.action,
-                 drop.unused.levels=drop.unused.levels, xlev=xlev, sparse=sparse)
+    xy <- eval.parent(cl)
 
     model <- cvAlpha.glmnet.default(xy$x, xy$y, weights=xy$weights, offset=xy$offset, ...)
     model$call <- match.call()
