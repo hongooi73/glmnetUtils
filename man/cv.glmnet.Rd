@@ -12,8 +12,8 @@ cv.glmnet(x, ...)
 
 \method{cv.glmnet}{default}(x, ...)
 
-\method{cv.glmnet}{formula}(formula, data, ..., weights, offset = NULL,
-  subset = NULL, na.action = getOption("na.action"),
+\method{cv.glmnet}{formula}(formula, data, ..., weights = NULL,
+  offset = NULL, subset = NULL, na.action = getOption("na.action"),
   drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
   use.model.frame = FALSE)
 

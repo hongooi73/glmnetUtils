@@ -81,6 +81,7 @@ glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset
 #' @param object For the \code{predict} and \code{coef} methods, an object of class \code{glmnet.formula}.
 #' @param newdata For the \code{predict} method, a data frame containing the observations for which to calculate predictions.
 #' @rdname glmnet
+#' @importFrom Matrix sparse.model.matrix
 #' @export
 #' @method predict glmnet.formula
 predict.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
@@ -93,8 +94,8 @@ predict.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
         tt <- delete.response(object$terms)
         newdata <- model.frame(tt, newdata, na.action=na.action)
         x <- if(object$sparse)
-            dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
-        else dropIntercept(model.matrix(tt, newdata))
+            Matrix::sparse.model.matrix(tt, newdata)[, -1, drop=FALSE]
+        else model.matrix(tt, newdata)[, -1, drop=FALSE]
     }
     else
     {

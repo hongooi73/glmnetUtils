@@ -58,7 +58,7 @@ glmnet::cv.glmnet(x, ...)
 #' @rdname cv.glmnet
 #' @method cv.glmnet formula
 #' @export
-cv.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL, na.action=getOption("na.action"),
+cv.glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
                               drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, use.model.frame=FALSE)
 {
     xyFunc <- if(use.model.frame)
@@ -93,8 +93,8 @@ predict.cv.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
         tt <- delete.response(object$terms)
         newdata <- model.frame(tt, newdata, na.action=na.action)
         x <- if(object$sparse)
-            dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
-        else dropIntercept(model.matrix(tt, newdata))
+            Matrix::sparse.model.matrix(tt, newdata)[, -1, drop=FALSE]
+        else model.matrix(tt, newdata)[, -1, drop=FALSE]
     }
     else
     {

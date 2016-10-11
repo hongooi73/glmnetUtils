@@ -125,8 +125,9 @@ cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, .
 #' @rdname cvAlpha.glmnet
 #' @method cvAlpha.glmnet formula
 #' @export
-cvAlpha.glmnet.formula <- function(formula, data, ..., weights, offset=NULL, subset=NULL, na.action=getOption("na.action"),
-                                   drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, use.model.frame=FALSE)
+cvAlpha.glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset=NULL,
+                                   na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL, 
+                                   sparse=FALSE, use.model.frame=FALSE)
 {
     xyFunc <- if(use.model.frame)
         makeModelComponentsMF
@@ -184,8 +185,8 @@ predict.cvAlpha.glmnet.formula <- function(object, newdata, alpha, which=match(T
         tt <- delete.response(object$terms)
         newdata <- model.frame(tt, newdata, na.action=na.action)
         x <- if(object$sparse)
-            dropIntercept(Matrix::sparse.model.matrix(tt, newdata))
-        else dropIntercept(model.matrix(tt, newdata))
+            Matrix::sparse.model.matrix(tt, newdata)[, -1, drop=FALSE]
+        else model.matrix(tt, newdata)[, -1, drop=FALSE]
     }
     else
     {

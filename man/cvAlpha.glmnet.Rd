@@ -16,8 +16,8 @@ cvAlpha.glmnet(x, ...)
 \method{cvAlpha.glmnet}{default}(x, y, alpha = seq(0, 1, len = 11)^3,
   nfolds = 10, ..., outerParallel = NULL, checkInnerParallel = TRUE)
 
-\method{cvAlpha.glmnet}{formula}(formula, data, ..., weights, offset = NULL,
-  subset = NULL, na.action = getOption("na.action"),
+\method{cvAlpha.glmnet}{formula}(formula, data, ..., weights = NULL,
+  offset = NULL, subset = NULL, na.action = getOption("na.action"),
   drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
   use.model.frame = FALSE)
 
