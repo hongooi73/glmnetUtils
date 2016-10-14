@@ -89,19 +89,16 @@ predict.cv.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
     if(!inherits(object, "cv.glmnet.formula"))
         stop("invalid cv.glmnet.formula object")
 
-    if(object$use.model.frame)
-    {
-        tt <- delete.response(object$terms)
-        newdata <- model.frame(tt, newdata, na.action=na.action)
-        x <- if(object$sparse)
-            Matrix::sparse.model.matrix(tt, newdata)[, -1, drop=FALSE]
-        else model.matrix(tt, newdata)[, -1, drop=FALSE]
-    }
-    else
-    {
-        rhs <- object$terms
-        x <- makeModelComponents(rhs, newdata, na.action=na.action)$x
-    }
+    # must use NSE to get model.frame emulation to work
+    cl <- match.call(expand.dots=FALSE)
+    cl$formula <- object$terms
+    cl$data <- cl$newdata
+    cl[[1]] <- if(object$use.model.frame)
+        makeModelComponentsMF
+    else makeModelComponents
+    xy <- eval.parent(cl)
+    x <- xy$x
+    offset <- xy$offset
 
     class(object) <- class(object)[-1]
     predict(object, x, ...)

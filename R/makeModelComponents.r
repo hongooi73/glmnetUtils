@@ -82,9 +82,26 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
             data <- data[eval(subset, data, parent.frame()), , drop=FALSE]
     }
 
+    offset <- substitute(offset)
+    offsetVals <- eval(offset, data, parent.frame())
+
+    if(!missing(weights) && !is.null(weights <- substitute(weights)))  # yes, assignment in an if
+        weightVals <- eval(weights, data, parent.frame())
+    else weightVals <- rep(1, nrow(data))
+
     if(!is.function(na.action))
         na.action <- get(na.action, mode="function")
-    data <- na.action(data[c(lhsVars, rhsVars)])
+    if(!is.null(offset))
+    {
+        data <- na.action(cbind(data[c(lhsVars, rhsVars)], offsetVals, weightVals))
+        offsetVals <- data$offsetVals
+    }
+    else
+    {
+        data <- na.action(cbind(data[c(lhsVars, rhsVars)], weightVals))
+        offsetVals <- NULL
+    }
+    weightsVals <- data$weightsVals
 
     matrs <- sapply(rhsVars, function(x) {
         if(is.numeric(data[[x]]) || is.logical(data[[x]]))
@@ -100,14 +117,6 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     terms <- do.call("~", list(rhs))
     environment(terms) <- NULL  # ensure we don't save tons of crap by accident
 
-    offset <- substitute(offset)
-    offset <- eval(offset, data, parent.frame())
-
-    if(!missing(weights) && !is.null(weights <- substitute(weights)))
-        weights <- eval(weights, data, parent.frame())
-    else weights <- rep(1, nrow(data))
-
-
-    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weights, offset=offset, terms=terms)
+    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=terms)
 }
 
