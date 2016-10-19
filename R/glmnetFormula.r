@@ -24,6 +24,7 @@ glmnet::glmnet(x, ...)
 #' @param na.action A function which indicates what should happen when the data contains missing values. For the \code{predict} method, \code{na.action = na.pass} will predict missing values with \code{NA}; \code{na.omit} or \code{na.exclude} will drop them.
 #' @param drop.unused.levels Should factors have unused levels dropped? Defaults to \code{FALSE}.
 #' @param xlev A named list of character vectors giving the full set of levels to be assumed for each factor.
+#' @param alpha The elastic net mixing parameter. See \code{\link[glmnet:glmnet]{glmnet::glmnet}} for more details.
 #' @param sparse Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels (but see the warning below).
 #' @param use.model.frame Should the base \code{\link{model.frame}} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.
 #' @param ... For \code{glmnet.formula} and \code{glmnet.default}, other arguments to be passed to \code{\link[glmnet:glmnet]{glmnet::glmnet}}; for the \code{predict} and \code{coef} methods, arguments to be passed to their counterparts in package \code{glmnet}.
@@ -57,9 +58,11 @@ glmnet::glmnet(x, ...)
 #' }
 #' @rdname glmnet
 #' @method glmnet formula
+#' @importFrom glmnet glmnet
 #' @export
-glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
-                           drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, use.model.frame=FALSE)
+glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NULL, subset=NULL,
+                           na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL,
+                           sparse=FALSE, use.model.frame=FALSE)
 {
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
@@ -71,6 +74,7 @@ glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset
     model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, ...)
     model$call <- match.call()
     model$terms <- xy$terms
+    model$alpha <- alpha
     model$sparse <- sparse
     model$use.model.frame <- use.model.frame
     model$na.action <- na.action
@@ -114,5 +118,29 @@ coef.glmnet.formula <- function(object, ...)
         stop("invalid glmnet.formula object")
     class(object) <- class(object)[-1]
     coef(object, ...)
+}
+
+
+#' @param digits Significant digits in printed output
+#' @param print.deviance.ratios Whether to print the table of deviance ratios, as per \code{\link[glmnet:print.glmnet]{glmnet:::print.glmnet}}
+#' @rdname glmnet
+#' @export
+#' @method print glmnet.formula
+print.glmnet.formula <- function(x, digits=max(3, getOption("digits") - 3), print.deviance.ratios=FALSE, ...)
+{
+    cat("Call:\n")
+    dput(x$call)
+    cat("\nModel fitting options:")
+    cat("\n    Sparse model matrix:", x$sparse)
+    cat("\n    Use model.frame:", x$use.model.frame)
+    cat("\n    Alpha:", x$alpha)
+    cat("\n    Lambda summary:\n")
+    print(summary(x$lambda))
+    if(print.deviance.ratios)
+    {
+        cat("\nDeviance ratios:\n")
+        print(cbind(Df=x$df, `%Dev`=signif(x$dev.ratio, digits), Lambda=signif(x$lambda, digits)))
+    }
+    invisible(x)
 }
 

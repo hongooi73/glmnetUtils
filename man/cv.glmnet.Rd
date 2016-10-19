@@ -6,20 +6,23 @@
 \alias{cv.glmnet.default}
 \alias{cv.glmnet.formula}
 \alias{predict.cv.glmnet.formula}
+\alias{print.cv.glmnet.formula}
 \title{Formula interface for elastic net cross-validation with cv.glmnet}
 \usage{
 cv.glmnet(x, ...)
 
 \method{cv.glmnet}{default}(x, ...)
 
-\method{cv.glmnet}{formula}(formula, data, ..., weights = NULL,
-  offset = NULL, subset = NULL, na.action = getOption("na.action"),
-  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
-  use.model.frame = FALSE)
+\method{cv.glmnet}{formula}(formula, data, alpha = 1, nfolds = 10, ...,
+  weights = NULL, offset = NULL, subset = NULL,
+  na.action = getOption("na.action"), drop.unused.levels = FALSE,
+  xlev = NULL, sparse = FALSE, use.model.frame = FALSE)
 
 \method{predict}{cv.glmnet.formula}(object, newdata, na.action = na.pass, ...)
 
 \method{coef}{cv.glmnet.formula}(object, ...)
+
+\method{print}{cv.glmnet.formula}(x, ...)
 }
 \arguments{
 \item{x}{For the default method, a matrix of predictor variables.}
@@ -29,6 +32,10 @@ cv.glmnet(x, ...)
 \item{formula}{A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.}
 
 \item{data}{A data frame or matrix containing the variables in the formula.}
+
+\item{alpha}{The elastic net mixing parameter. See \code{\link[glmnet:glmnet]{glmnet::glmnet}} for more details.}
+
+\item{nfolds}{The number of crossvalidation folds to use. See \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}} for more details.}
 
 \item{weights}{An optional vector of case weights to be used in the fitting process. If missing, defaults to an unweighted fit.}
 

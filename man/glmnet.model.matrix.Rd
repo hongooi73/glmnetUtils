@@ -5,9 +5,10 @@
 \alias{glmnet.model.matrix}
 \alias{glmnet.modelFrame}
 \alias{glmnet.modelMatrix}
-\title{Model matrix options for glmnet
-
-This page describes the options available for generating the model matrix.}
+\title{Model matrix options for glmnet}
+\description{
+This page describes the options available for generating the model matrix.
+}
 \details{
 There are two ways in which glmnetUtils can generate a model matrix out of a formula and data frame. The first is to use the standard R machinery comprising \code{\link{model.frame}} and \code{\link{model.matrix}}; and the second is to build the matrix one variable at a time. These options are discussed and contrasted below.
 }

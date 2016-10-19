@@ -6,20 +6,25 @@
 \alias{glmnet.default}
 \alias{glmnet.formula}
 \alias{predict.glmnet.formula}
+\alias{print.glmnet.formula}
 \title{Formula interface for elastic net modelling with glmnet}
 \usage{
 glmnet(x, ...)
 
 \method{glmnet}{default}(x, ...)
 
-\method{glmnet}{formula}(formula, data, ..., weights = NULL, offset = NULL,
-  subset = NULL, na.action = getOption("na.action"),
+\method{glmnet}{formula}(formula, data, alpha = 1, ..., weights = NULL,
+  offset = NULL, subset = NULL, na.action = getOption("na.action"),
   drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
   use.model.frame = FALSE)
 
-\method{predict}{glmnet.formula}(object, newdata, na.action = na.pass, ...)
+\method{predict}{glmnet.formula}(object, newdata, offset = NULL,
+  na.action = na.pass, ...)
 
 \method{coef}{glmnet.formula}(object, ...)
+
+\method{print}{glmnet.formula}(x, digits = max(3, getOption("digits") - 3),
+  print.deviance.ratios = FALSE, ...)
 }
 \arguments{
 \item{x}{For the default method, a matrix of predictor variables.}
@@ -29,6 +34,8 @@ glmnet(x, ...)
 \item{formula}{A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.}
 
 \item{data}{A data frame or matrix containing the variables in the formula.}
+
+\item{alpha}{The elastic net mixing parameter. See \code{\link[glmnet:glmnet]{glmnet::glmnet}} for more details.}
 
 \item{weights}{An optional vector of case weights to be used in the fitting process. If missing, defaults to an unweighted fit.}
 
@@ -49,6 +56,10 @@ glmnet(x, ...)
 \item{object}{For the \code{predict} and \code{coef} methods, an object of class \code{glmnet.formula}.}
 
 \item{newdata}{For the \code{predict} method, a data frame containing the observations for which to calculate predictions.}
+
+\item{digits}{Significant digits in printed output}
+
+\item{print.deviance.ratios}{Whether to print the table of deviance ratios, as per \code{\link[glmnet:print.glmnet]{glmnet:::print.glmnet}}}
 }
 \description{
 Formula interface for elastic net modelling with glmnet

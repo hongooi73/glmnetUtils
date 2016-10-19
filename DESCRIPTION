@@ -1,16 +1,19 @@
 Package: glmnetUtils
 Type: Package
+Version: 0.55
 Title: Utilities for glmnet
-Depends:
-    glmnet
+Description: Utilities for glmnet.
 Imports:
+    glmnet,
     parallel,
     Matrix
-Version: 0.5
+Suggests:
+    knitr,
+    rmarkdown
 Author: Microsoft [aut], Hong Ooi [aut, cre]
 Maintainer: Hong Ooi <hongooi@microsoft.com>
-Description: Utilities for glmnet
 NeedsCompilation: no
+VignetteBuilder: knitr
 Copyright: Microsoft
 License: GPL-2
 Collate:

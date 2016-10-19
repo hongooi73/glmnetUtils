@@ -2,6 +2,7 @@
 #' @aliases glmnet.modelMatrix glmnet.model.frame glmnet.modelFrame
 #' @title Model matrix options for glmnet
 #'
+#' @description
 #' This page describes the options available for generating the model matrix.
 #'
 #' @details

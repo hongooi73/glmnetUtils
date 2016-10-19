@@ -21,7 +21,7 @@ UseMethod("cvAlpha.glmnet")
 #' Optionally this loop over alpha can be parallelised; currently, \code{cvAlpha.glmnet} knows about two methods of doing so:
 #' \itemize{
 #'   \item Via \code{\link{parLapply}} in the \code{parallel} package. To use this, set \code{outerParallel} to a valid cluster object created by \code{\link{makeCluster}}.
-#'   \item Via \code{\link{rxExec}} as supplied by Microsoft R Server's \code{RevoScaleR} package. To use this, set \code{outerParallel} to a valid compute context created by \code{\link{RxComputeContext}}, or a character string specifying such a context.
+#'   \item Via \code{\link[RevoScaleR:rxExec]{rxExec}} as supplied by Microsoft R Server's \code{RevoScaleR} package. To use this, set \code{outerParallel} to a valid compute context created by \code{\link[RevoScaleR:RxComputeContext]{RxComputeContext}}, or a character string specifying such a context.
 #' }
 #' If the outer loop is run in parallel, \code{cvAlpha.glmnet} can check if the inner loop (over lambda) is also set to run in parallel, and disable this if it would lead to contention for cores. This is done if it is likely that the parallelisation is local on a multicore machine, ie if \code{outerParallel} is a \code{SOCKcluster} object running on \code{"localhost"}, or if the supplied compute context is local parallel.
 #'
@@ -30,14 +30,14 @@ UseMethod("cvAlpha.glmnet")
 #' @rdname cvAlpha.glmnet
 #' @method cvAlpha.glmnet default
 #' @importFrom parallel parLapply
+#' @importFrom glmnet cv.glmnet
 #' @export
 cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, ..., outerParallel=NULL,
                                    checkInnerParallel=TRUE)
 {
     .cvfunc <- function(a, xmat, y, nfolds, foldid, ...)
     {
-        require(glmnet)
-        cv.glmnet(x, y, alpha=a, nfolds=nfolds, foldid=foldid, ...)
+        glmnet::cv.glmnet(x, y, alpha=a, nfolds=nfolds, foldid=foldid, ...)
     }
 
     .chkPar <- function()
@@ -53,10 +53,11 @@ cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, .
     dotargs <- list(...)
 
     # do not explicitly import RevoScaleR; this allows use with non-Microsoft R installs
+    # hide Revo from R CMD check, in case we ever want to put this on CRAN
     rxContexts <- c("RxLocalSeq", "local", "RxLocalParallel", "localpar", "RxHadoopMR", "hadoopmr", "RxSpark", "spark",
                     "RxInTeradata", "teradata", "RxForeachDoPar", "dopar", "RxInSqlServer", "sqlserver")
-    if(is.character(outerParallel) && (outerParallel %in% rxContexts) && require(RevoScaleR))
-        outerParallel <- RevoScaleR::RxComputeContext(outerParallel)
+    if(is.character(outerParallel) && (outerParallel %in% rxContexts) && eval(parse(text="require(RevoScaleR)")))
+        outerParallel <- eval(parse(text="RevoScaleR::RxComputeContext"))(outerParallel)
 
     lst <- if(inherits(outerParallel, "cluster"))
     {
@@ -65,13 +66,13 @@ cvAlpha.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, .
         do.call(parallel::parLapply, c(list(outerParallel, alpha, .cvfunc, xmat=x, y=y, nfolds=nfolds, foldid=foldid),
                 dotargs))
     }
-    else if(is(outerParallel, "RxComputeContext"))
+    else if(is(outerParallel, "RxComputeContext"))  # assume RevoScaleR in search path
     {
-        oldContext <- RevoScaleR::rxSetComputeContext(outerParallel)
-        on.exit(RevoScaleR::rxSetComputeContext(oldContext))
+        oldContext <- rxSetComputeContext(outerParallel)
+        on.exit(rxSetComputeContext(oldContext))
         if(is(outerParallel, "RxLocalParallel"))
             .chkPar()
-        do.call(RevoScaleR::rxExec, c(list(.cvfunc, a=RevoScaleR::rxElemArg(alpha), xmat=x, y=y, nfolds=nfolds,
+        do.call(rxExec, c(list(.cvfunc, a=rxElemArg(alpha), xmat=x, y=y, nfolds=nfolds,
                 foldid=foldid), dotargs))
     }
     else if(is.null(outerParallel))
@@ -211,6 +212,22 @@ coef.cvAlpha.glmnet <- function(object, alpha, which=match(TRUE, abs(object$alph
         stop("supplied alpha value not found")
     mod <- object$modlist[[which]]
     coef(mod, ...)
+}
+
+
+#' @rdname cvAlpha.glmnet
+#' @method print cvAlpha.glmnet.formula
+#' @export
+print.cvAlpha.glmnet.formula <- function(x, ...)
+{
+    cat("Call:\n")
+    dput(x$call)
+    cat("\nModel fitting options:")
+    cat("\n    Sparse model matrix:", x$sparse)
+    cat("\n    Use model.frame:", x$use.model.frame)
+    cat("\n    Alpha values:", x$alpha)
+    cat("\n    Number of crossvalidation folds for lambda:", x$nfolds)
+    invisible(x)
 }
 
 
