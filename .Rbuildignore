@@ -3,3 +3,4 @@
 ^.*\.rproj$
 ^.*\.tss$
 ^.vs$
+^misc$

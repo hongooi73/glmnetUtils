@@ -120,7 +120,7 @@ print(res, unit="s", digits=2)
 ##  glmnet(y ~ ., df3, use.model.frame = FALSE) 3.347  3.508  3.650  3.621  3.777  3.975    10
 ```
 
-From this, we can see that for datasets with up to 1,000 predictors, both methods are about as fast as each other. However, for 10,000 predictors (not uncommon these days), the `model.frame` method takes three times longer than building up the model matrix term by term.
+From this, we can see that for datasets with up to 1,000 predictors, both methods are about as fast as each other. However, for 10,000 predictors (not uncommon these days), the `model.frame` method takes three times as long as building the model matrix term by term.
 
 ### Sparse model matrix
 

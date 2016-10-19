@@ -1,6 +1,7 @@
 .vs/
 *.tss
 .Rhistory
+misc/
 
 #################
 ## Eclipse
