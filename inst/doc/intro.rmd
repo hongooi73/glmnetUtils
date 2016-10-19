@@ -11,7 +11,7 @@ vignette: >
 library(glmnetUtils)
 ```
 
-The glmnetUtils package provides some quality-of-life functions to streamline the process of fitting elastic net models with [glmnet](https://http://cran.r-project.org/package=glmnet). I wrote the package after a couple of projects where I found myself writing the same boilerplate code to convert a data frame into a predictor matrix and a response vector. In addition to this, it also provides a function `cvAlpha.glmnet` to do crossvalidation for both $\alpha$ and $\lambda$, as well as some utility functions.
+The glmnetUtils package provides some quality-of-life functions to streamline the process of fitting elastic net models with [glmnet](https://cran.r-project.org/package=glmnet). I wrote the package after a couple of projects where I found myself writing the same boilerplate code to convert a data frame into a predictor matrix and a response vector. In addition to this, it also provides a function `cvAlpha.glmnet` to do crossvalidation for both $\alpha$ and $\lambda$, as well as some utility functions.
 
 ## The formula interface
 
