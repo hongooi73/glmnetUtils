@@ -48,6 +48,14 @@ summary(as.numeric(predict(mtcarsMod, mtcars) -
 #  )
 #  print(res, unit="s", digits=2)
 
+## ---- eval=FALSE---------------------------------------------------------
+#  df4 <- makeSampleData(N=1000, P=100000)
+#  
+#  glmnet(y ~ ., df4, use.model.frame=TRUE)
+
+## ---- eval=FALSE---------------------------------------------------------
+#  glmnet(y ~ ., df4, use.model.frame=FALSE)
+
 ## ---- echo=FALSE---------------------------------------------------------
 if(!file.exists("~/Leukemia.rdata"))
     download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData", "~/Leukemia.rdata", mode="wb")

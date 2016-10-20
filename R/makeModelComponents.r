@@ -67,7 +67,9 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     if(identical(quote(.), rhs))
     {
         rhsVars <- setdiff(names(data), lhsVars)
-        rhs <- formula(paste("~", paste(rhsVars, collapse="+")))[[2]]
+        # rhs is an _unevaluated_ call object containing a formula
+        # this avoids possible stack overflow with large no. of terms
+        rhs <- parse(text=paste("~", paste(rhsVars, collapse="+")))[[1]][[2]]
     }
     rhsVars <- all.vars(rhs)
     rhsNames <- all.names(rhs)
@@ -114,10 +116,9 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
                 drop.unused.levels=drop.unused.levels, xlev=xlev)
     }, simplify=FALSE)
 
-    # cut-down version of real terms object: just a formula
-    terms <- do.call("~", list(rhs))
+    # cut-down version of real terms object: an (unevaluated) call object containing a formula
+    terms <- parse(text=paste("~", paste(rhsVars, collapse="+")))[[1]]
     environment(terms) <- NULL  # ensure we don't save tons of crap by accident
 
     list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=terms)
 }
-

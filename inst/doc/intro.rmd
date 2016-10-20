@@ -81,7 +81,7 @@ The main downside of not using `model.frame` is that the formula can only be rel
 
 To examine the speed impact of using `model.frame`, let's do some simple comparisons of run times. We'll generate sample datasets with 100, 1,000 and 10,000 predictors, and then run `glmnet` with both options for generating the model matrix.
 
-<!--- don't eval: speed up vignette build, work around RTVS issue -->
+<!--- don't eval: speed up vignette build -->
 ```{r, eval=FALSE}
 # generate sample (uncorrelated) data of a given size
 makeSampleData <- function(N, P)
@@ -111,20 +111,52 @@ print(res, unit="s", digits=2)
 <!--- previous output -->
 ```
 ## Unit: seconds
-##                                         expr   min     lq   mean median     uq    max neval
-##   glmnet(y ~ ., df1, use.model.frame = TRUE) 0.021  0.022  0.024  0.023  0.023  0.035    10
-##  glmnet(y ~ ., df1, use.model.frame = FALSE) 0.018  0.018  0.019  0.019  0.019  0.021    10
-##   glmnet(y ~ ., df2, use.model.frame = TRUE) 4.526  4.614  4.839  4.833  4.987  5.305    10
-##  glmnet(y ~ ., df2, use.model.frame = FALSE) 3.984  4.132  4.324  4.240  4.410  5.115    10
-##   glmnet(y ~ ., df3, use.model.frame = TRUE) 9.792 10.321 10.881 10.765 11.693 12.216    10
-##  glmnet(y ~ ., df3, use.model.frame = FALSE) 3.347  3.508  3.650  3.621  3.777  3.975    10
+##                                         expr   min    lq   mean median      uq    max neval
+##   glmnet(y ~ ., df1, use.model.frame = TRUE) 0.020 0.021  0.022  0.021   0.022  0.025    10
+##  glmnet(y ~ ., df1, use.model.frame = FALSE) 0.017 0.018  0.019  0.018   0.019  0.022    10
+##   glmnet(y ~ ., df2, use.model.frame = TRUE) 3.844 4.132  4.508  4.358   4.759  5.504    10
+##  glmnet(y ~ ., df2, use.model.frame = FALSE) 3.731 3.855  4.092  3.990   4.316  4.647    10
+##   glmnet(y ~ ., df3, use.model.frame = TRUE) 8.587 8.678 10.268  9.484  10.373 17.714    10
+##  glmnet(y ~ ., df3, use.model.frame = FALSE) 3.207 3.255  3.319  3.318   3.340  3.549    10
 ```
 
 From this, we can see that for datasets with up to 1,000 predictors, both methods are about as fast as each other. However, for 10,000 predictors (not uncommon these days), the `model.frame` method takes three times as long as building the model matrix term by term.
 
+What happens if we take it up to 100,000 predictors? As seen below, the standard approach of using `model.frame` fails when R runs out of memory: the data frame itself is about 800MB in size, but trying to allocate the `terms` object requires more then 67GB. However, building the model matrix by term still works, and (on this machine) finishes in about two minutes.
+
+```{r, eval=FALSE}
+df4 <- makeSampleData(N=1000, P=100000)
+
+glmnet(y ~ ., df4, use.model.frame=TRUE)
+```
+
+```
+## Warning in terms.formula(formula, data = data): Reached total allocation of
+## 32666Mb: see help(memory.size)
+
+## Error: cannot allocate vector of size 37.3 Gb
+```
+
+```{r, eval=FALSE}
+glmnet(y ~ ., df4, use.model.frame=FALSE)
+```
+
+```
+## Call:
+## glmnet.formula(formula = y ~ ., data = df4, use.model.frame = FALSE)
+## 
+## Model fitting options:
+##     Sparse model matrix: FALSE
+##     Use model.frame: FALSE
+##     Alpha: 1
+##     Lambda summary:
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 0.002393 0.006506 0.017680 0.032470 0.048080 0.130700
+```
+
 ### Sparse model matrix
 
-As an option, glmnetUtils can also generate a _sparse_ model matrix, using the `sparse.model.matrix` function provided in the Matrix package. This works exactly the same as a regular model matrix, but can take up significantly less memory if many of its entries are zero. A scenario where this is the case would be where many of the predictors are factors, each with a large number of levels. This can be combined with both of the previously mentioned options for generating model matrices.
+As an option, glmnetUtils can also generate a _sparse_ model matrix, using the `sparse.model.matrix` function provided in the Matrix package. This works exactly the same as a regular model matrix, but takes up significantly less memory if many of its entries are zero. A scenario where this is the case would be where many of the predictors are factors, each with a large number of levels. This can be combined with both of the previously mentioned options for generating model matrices.
 
 ## Crossvalidation for $\alpha$
 
