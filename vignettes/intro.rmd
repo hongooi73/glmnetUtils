@@ -11,51 +11,51 @@ vignette: >
 library(glmnetUtils)
 ```
 
-The glmnetUtils package provides some quality-of-life functions to streamline the process of fitting elastic net models with [glmnet](https://cran.r-project.org/package=glmnet). I wrote the package after a couple of projects where I found myself writing the same boilerplate code to convert a data frame into a predictor matrix and a response vector. In addition to this, it also provides a function `cvAlpha.glmnet` to do crossvalidation for both $\alpha$ and $\lambda$, as well as some utility functions.
+The [glmnetUtils package](https://github.com/hong-revo/glmnetUtils) provides a collection of tools to streamline the process of fitting elastic net models with [glmnet](https://cran.r-project.org/package=glmnet). I wrote the package after a couple of projects where I found myself writing the same boilerplate code to convert a data frame into a predictor matrix and a response vector. In addition to providing a formula interface, it also features a function `cvAlpha.glmnet` to do crossvalidation for both $\alpha$ and $\lambda$, as well as some utility functions.
 
 ## The formula interface
 
-The interface that glmnetUtils provides is very much the same as for most modelling functions in R. To fit a model, you provide a formula and data frame:
+The interface that glmnetUtils provides is very much the same as for most modelling functions in R. To fit a model, you provide a formula and data frame. You can also provide any arguments that glmnet will accept. Here are some simple examples for different types of data:
 
 ```{r}
-mtcarsMod <- glmnet(mpg ~ cyl + disp + hp, data=mtcars)
-mtcarsMod
+# least squares regression
+(mtcarsMod <- glmnet(mpg ~ cyl + disp + hp, data=mtcars))
+
+# multinomial logistic regression with specified elastic net alpha parameter
+(irisMod <- glmnet(Species ~ ., data=iris, family="multinomial", alpha=0.5))
+
+# Poisson regression with an offset
+(InsMod <- glmnet(Claims ~ District + Group + Age, data=MASS::Insurance,
+                  family="poisson", offset=log(Holders)))
 ```
 
-Under the hood, glmnetUtils creates a model matrix and response vector, and passes them to the glmnet package to do the actual model fitting. A simple `print` method is also provided, to show the main model details at a glance. I'll discuss the "sparse model matrix" and "use model.frame" options below.
+Under the hood, glmnetUtils creates a model matrix and response vector, and passes them to the glmnet package to do the actual model fitting. A simple `print` method is also provided, to show the main model details at a glance. I'll describe shortly what the "sparse model matrix" and "use model.frame" options do.
 
-You can supply any of the usual arguments to `glmnet`. For example, this fits a multinomial regression model to the iris data, using $\alpha = 0.5$ and a custom $\lambda$ sequence:
+Predicting from a model works as you'd expect: just pass a data frame containing the new observations to the `predict` method. You can also specify any arguments that `predict.glmnet` accepts.
 
-```{r}
-glmnet(Species ~ ., data=iris, family="multinomial", alpha=0.5, lambda=seq(1e-4, 1, len=100))
-```
+```{r, eval=FALSE}
+# least squares regression: get predictions for lambda=1
+predict(mtcarsMod, newdata=mtcars, s=1)
 
-Similarly, there is a formula interface for `cv.glmnet`:
+# multinomial logistic regression: get predicted class
+predict(irisMod, newdata=iris, type="class")
 
-```{r}
-cv.glmnet(mpg ~ cyl + disp + hp, data=mtcars)
-```
-
-Predicting works as with regular R modelling functions: simply provide a data frame containing the new data. Again, you can supply any of the arguments to `predict.glmnet`, for example to get predictions for a specific value of $\lambda$.
-
-```{r}
-mtcarsPred <- predict(mtcarsMod, mtcars, s=1)  # predictions for a specific lambda
-head(mtcarsPred)
+# Poisson regression: need to specify offset
+predict(InsMod, newdata=MASS::Insurance, offset=log(Holders))
 ```
 
 If you want, you can still use the original model matrix-plus-response syntax:
 
 ```{r}
 mtcarsX <- as.matrix(mtcars[c("cyl", "disp", "hp")])
-mtcarsY <- mtcars[["mpg"]]
+mtcarsY <- mtcars$mpg
 mtcarsMod2 <- glmnet(mtcarsX, mtcarsY)
 
 summary(as.numeric(predict(mtcarsMod, mtcars) - 
                    predict(mtcarsMod2, mtcarsX)))
 ```
 
-The resulting models are identical, in terms of the predictions they make and the regularisation parameters used.
-
+This shows that the resulting models are identical, in terms of the predictions they make and the regularisation parameters used.
 
 ## Generating the model matrix
 

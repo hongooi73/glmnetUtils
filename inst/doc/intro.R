@@ -2,22 +2,29 @@
 library(glmnetUtils)
 
 ## ------------------------------------------------------------------------
-mtcarsMod <- glmnet(mpg ~ cyl + disp + hp, data=mtcars)
-mtcarsMod
+# least squares regression
+(mtcarsMod <- glmnet(mpg ~ cyl + disp + hp, data=mtcars))
 
-## ------------------------------------------------------------------------
-glmnet(Species ~ ., data=iris, family="multinomial", alpha=0.5, lambda=seq(1e-4, 1, len=100))
+# multinomial logistic regression with specified elastic net alpha parameter
+(irisMod <- glmnet(Species ~ ., data=iris, family="multinomial", alpha=0.5))
 
-## ------------------------------------------------------------------------
-cv.glmnet(mpg ~ cyl + disp + hp, data=mtcars)
+# Poisson regression with an offset
+(InsMod <- glmnet(Claims ~ District + Group + Age, data=MASS::Insurance,
+                  family="poisson", offset=log(Holders)))
 
-## ------------------------------------------------------------------------
-mtcarsPred <- predict(mtcarsMod, mtcars, s=1)  # predictions for a specific lambda
-head(mtcarsPred)
+## ---- eval=FALSE---------------------------------------------------------
+#  # least squares regression: get predictions for lambda=1
+#  predict(mtcarsMod, newdata=mtcars, s=1)
+#  
+#  # multinomial logistic regression: get predicted class
+#  predict(irisMod, newdata=iris, type="class")
+#  
+#  # Poisson regression: need to specify offset
+#  predict(InsMod, newdata=MASS::Insurance, offset=log(Holders))
 
 ## ------------------------------------------------------------------------
 mtcarsX <- as.matrix(mtcars[c("cyl", "disp", "hp")])
-mtcarsY <- mtcars[["mpg"]]
+mtcarsY <- mtcars$mpg
 mtcarsMod2 <- glmnet(mtcarsX, mtcarsY)
 
 summary(as.numeric(predict(mtcarsMod, mtcars) - 
