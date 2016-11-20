@@ -52,6 +52,9 @@ makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subs
 makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
                                 drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, ...)
 {
+    tickQuote <- function(x)
+        paste0("`", x, "`")
+
     if(length(formula) == 3)
     {
         rhs <- formula[[3]]
@@ -69,7 +72,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         rhsVars <- setdiff(names(data), lhsVars)
         # rhs is an _unevaluated_ call object containing a formula
         # this avoids possible stack overflow with large no. of terms
-        rhs <- parse(text=paste("~", paste(rhsVars, collapse="+")))[[1]][[2]]
+        rhs <- parse(text=paste("~", paste(tickQuote(rhsVars), collapse="+")))[[1]][[2]]
     }
     rhsVars <- all.vars(rhs)
     rhsNames <- all.names(rhs)
@@ -117,7 +120,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     }, simplify=FALSE)
 
     # cut-down version of real terms object: an (unevaluated) call object containing a formula
-    terms <- parse(text=paste("~", paste(rhsVars, collapse="+")))[[1]]
+    terms <- parse(text=paste("~", paste(tickQuote(rhsVars), collapse="+")))[[1]]
     environment(terms) <- NULL  # ensure we don't save tons of crap by accident
 
     list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=terms)
