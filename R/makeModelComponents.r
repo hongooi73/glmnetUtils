@@ -104,7 +104,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         data <- na.action(cbind(data[c(lhsVars, rhsVars)], weightVals))
         offsetVals <- NULL
     }
-    weightsVals <- data$weightsVals
+    weightVals <- data$weightVals
 
     matrs <- sapply(rhsVars, function(x) {
         if(is.numeric(data[[x]]) || is.logical(data[[x]]))
