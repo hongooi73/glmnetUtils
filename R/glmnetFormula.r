@@ -71,7 +71,7 @@ glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NUL
     else makeModelComponents
     xy <- eval.parent(cl)
 
-    model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, ...)
+    model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
     model$call <- match.call()
     model$terms <- xy$terms
     model$alpha <- alpha

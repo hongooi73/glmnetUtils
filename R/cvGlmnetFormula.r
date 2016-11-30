@@ -72,7 +72,7 @@ cv.glmnet.formula <- function(formula, data, alpha=1, nfolds=10, ..., weights=NU
     else makeModelComponents
     xy <- eval.parent(cl)
 
-    model <- glmnet::cv.glmnet(xy$x, xy$y, weights=xy$weights, offset=xy$offset, ...)
+    model <- glmnet::cv.glmnet(xy$x, xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
     model$call <- match.call()
     model$terms <- xy$terms
     model$alpha <- alpha
