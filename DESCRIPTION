@@ -16,7 +16,7 @@ Suggests:
     MASS,
     doParallel,
     testthat
-Author: Microsoft [aut], Hong Ooi [aut, cre]
+Author: Microsoft [cph], Hong Ooi [aut, cre]
 Maintainer: Hong Ooi <hongooi@microsoft.com>
 NeedsCompilation: no
 VignetteBuilder: knitr

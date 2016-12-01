@@ -13,7 +13,7 @@ test_that("predict and coef work", {
 
     Bos_cvac0.1 <- coef(Bos_cva0, alpha=a)
     Bos_cvac0.2 <- coef(Bos_cva0, which=w)
-    expect_s4_class(Bos_cvac0, "Matrix")
+    expect_s4_class(Bos_cvac0.1, "Matrix")
     expect_equal(Bos_cvac0.1, Bos_cvac0.2)
 
     Bos_cvac0.3 <- coef(Bos_cva0, alpha=a, s=s)
@@ -22,7 +22,7 @@ test_that("predict and coef work", {
 
     Bos_cvap0.1 <- predict(Bos_cva0, Boston, alpha=a)
     Bos_cvap0.2 <- predict(Bos_cva0, Boston, which=w)
-    expect_type(Bos_cvap0, "double")
+    expect_type(Bos_cvap0.1, "double")
     expect_equal(Bos_cvap0.1, Bos_cvap0.2)
 
     Bos_cvap0.3 <- predict(Bos_cva0, Boston, alpha=a, s=s)
@@ -42,7 +42,7 @@ test_that("prediction with NA works", {
 })
 
 
-cl <- parallel::makeCluster(3)
+cl <- parallel::makeCluster(2)
 
 test_that("parallel backend works", {
     set.seed(898989)

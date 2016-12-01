@@ -62,15 +62,19 @@ test_that("prediction with NA works", {
 
 test_that("parallel foreach works", {
     skip_if_not_installed("doParallel")
-    doParallel::registerDoParallel()
+
+    cl <- parallel::makeCluster(2)
+    doParallel::registerDoParallel(cl)
+
     x <- as.matrix(iris[-5])
     y <- iris$Species
     set.seed(7777)
     mod1.0 <- cv.glmnet(x, y, family="multinomial", nfolds=5, parallel=TRUE)
     set.seed(7777)
     mod1.1 <- cv.glmnet(Species ~ ., data=iris, family="multinomial", nfolds=5, parallel=TRUE)
-    doParallel::stopImplicitCluster()
     expect_equal(mod1.0$beta, mod1.1$beta)
+
+    parallel::stopCluster(cl)
 })
 
 
