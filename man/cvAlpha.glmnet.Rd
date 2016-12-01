@@ -90,7 +90,7 @@ The \code{cvAlpha.glmnet} function does simultaneous cross-validation for both t
 Optionally this loop over alpha can be parallelised; currently, \code{cvAlpha.glmnet} knows about two methods of doing so:
 \itemize{
   \item Via \code{\link{parLapply}} in the \code{parallel} package. To use this, set \code{outerParallel} to a valid cluster object created by \code{\link{makeCluster}}.
-  \item Via \code{\link[RevoScaleR:rxExec]{rxExec}} as supplied by Microsoft R Server's \code{RevoScaleR} package. To use this, set \code{outerParallel} to a valid compute context created by \code{\link[RevoScaleR:RxComputeContext]{RxComputeContext}}, or a character string specifying such a context.
+  \item Via \code{rxExec} as supplied by Microsoft R Server's \code{RevoScaleR} package. To use this, set \code{outerParallel} to a valid compute context created by \code{RxComputeContext}, or a character string specifying such a context.
 }
 If the outer loop is run in parallel, \code{cvAlpha.glmnet} can check if the inner loop (over lambda) is also set to run in parallel, and disable this if it would lead to contention for cores. This is done if it is likely that the parallelisation is local on a multicore machine, ie if \code{outerParallel} is a \code{SOCKcluster} object running on \code{"localhost"}, or if the supplied compute context is local parallel.
 

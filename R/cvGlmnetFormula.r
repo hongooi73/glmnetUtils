@@ -136,6 +136,7 @@ print.cv.glmnet.formula <- function(x, ...)
     cat("\n    Number of crossvalidation folds:", x$nfolds)
     cat("\n    Alpha:", x$alpha)
     cat("\n    Deviance-minimizing lambda:", x$lambda.min, " (+1 SE):", x$lambda.1se)
+    cat("\n")
     invisible(x)
 }
 

@@ -33,7 +33,7 @@ makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subs
     cl <- match.call(expand.dots=FALSE)
     cl$sparse <- cl$`...` <- NULL
     cl[[1]] <- quote(stats::model.frame)
-    mf <- eval(cl)
+    mf <- eval.parent(cl)
 
     x <- if(!is.null(sparse) && sparse)
         Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1, drop=FALSE]
@@ -79,7 +79,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
     # only formulas of the form x1 + x2 + ... allowed, no expressions or interactions
     if(!setequal(c("+", rhsVars), c("+", rhsNames)))
-        stop("only simple formulas allowed")
+        stop("only additive formulas allowed")
 
     if(!missing(subset))
     {

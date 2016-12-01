@@ -4,12 +4,18 @@ Version: 0.55
 Title: Utilities for glmnet
 Description: Utilities for glmnet.
 Imports:
+    stats,
+    graphics,
+    grDevices,
     glmnet,
     parallel,
     Matrix
 Suggests:
     knitr,
-    rmarkdown
+    rmarkdown,
+    MASS,
+    doParallel,
+    testthat
 Author: Microsoft [aut], Hong Ooi [aut, cre]
 Maintainer: Hong Ooi <hongooi@microsoft.com>
 NeedsCompilation: no
