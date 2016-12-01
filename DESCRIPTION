@@ -1,6 +1,6 @@
 Package: glmnetUtils
 Type: Package
-Version: 0.55
+Version: 0.60
 Title: Utilities for glmnet
 Description: Utilities for glmnet.
 Imports:
