@@ -21,6 +21,31 @@ test_that("simple model matrix works", {
 })
 
 
+test_that("glmnet arguments work", {
+    x <- as.matrix(iris[-5])
+    y <- as.matrix(iris$Species)
+    mod00 <- glmnet::glmnet(x, y, family="multinomial", alpha=0.5)
+    mod0 <- glmnet(x, y, family="multinomial", alpha=0.5)
+    mod1 <- glmnet(Species ~ ., data=iris, family="multinomial")
+    expect_equivalent(mod00$beta, mod0$beta)
+    expect_equivalent(mod0$beta, mod1$beta)
+
+    data(Insurance, package="MASS")
+    # don't worry about ordered factors for now
+    class(Insurance$Group) <- "factor"
+    class(Insurance$Age) <- "factor"
+    x <- model.matrix(~ District + Group + Age, data=Insurance)[, -1]
+    y <- Insurance$Claims
+    ofs <- Insurance$Holders
+    mod00 <- glmnet::glmnet(x, y, family="poisson", offset=log(ofs))
+    mod0 <- glmnet(x, y, family="poisson", offset=log(ofs))
+    mod1 <- glmnet(Claims ~ District + Group + Age, data=Insurance, family="poisson", offset=log(Holders),
+                   use.model.frame=TRUE)
+    expect_equivalent(mod00$beta, mod0$beta)
+    expect_equivalent(mod0$beta, mod1$beta)
+})
+
+
 test_that("predict and coef work", {
     x <- as.matrix(iris[-5])
     y <- iris$Species
@@ -57,22 +82,20 @@ test_that("predict and coef work", {
 
 
 test_that("prediction with NA works", {
-    mod1.1 <- glmnet(mpg ~ ., data=mtcars, use.model.frame=TRUE)
-    mod1.2 <- glmnet(mpg ~ ., data=mtcars, use.model.frame=FALSE)
-    expect_equal(mod1.1$beta, mod1.2$beta)
+    data(Boston, package="MASS")
+    BostonNA <- Boston
+    BostonNA[1, ] <- NA
 
-    mtcarsNA <- mtcars
-    mtcarsNA[1, ] <- NA
-    s <- median(mod1.1$lambda)
+    mod1.1 <- glmnet(medv ~ ., data=Boston, alpha=0, use.model.frame=TRUE)
+    mod1.2 <- glmnet(medv ~ ., data=Boston, alpha=0, use.model.frame=FALSE)
 
-    pred1.1 <- predict(mod1.1, mtcarsNA, s=s, na.action=na.exclude)
-    pred1.2 <- predict(mod1.2, mtcarsNA, s=s, na.action=na.exclude)
+    pred1.1 <- predict(mod1.1, BostonNA, na.action=na.exclude)
+    pred1.2 <- predict(mod1.2, BostonNA, na.action=na.exclude)
     expect_equivalent(pred1.1, pred1.2)
     expect(all(!is.na(pred1.1)), "NAs found with na.exclude")
 
-    pred1.3 <- predict(mod1.1, mtcarsNA, s=s, na.action=na.pass)
-    pred1.4 <- predict(mod1.2, mtcarsNA, s=s, na.action=na.pass)
+    pred1.3 <- predict(mod1.1, BostonNA, na.action=na.pass)
+    pred1.4 <- predict(mod1.2, BostonNA, na.action=na.pass)
     expect_equivalent(pred1.3, pred1.4)
     expect(all(is.na(pred1.3[1, ])), "NAs dropped with na.pass")
 })
-

@@ -1,81 +1,82 @@
-context("Simple model matrix")
+context("Simple model frame")
 
-test_that("simple model matrix works", {
-    mod1 <- glmnet(mpg ~ ., data=mtcars)
-    expect_s3_class(mod1, "glmnet")
+std_mf <- glmnetUtils:::makeModelComponentsMF
+simple_mf <- glmnetUtils:::makeModelComponents
+
+
+test_that("simple model frame works", {
+    xy <- simple_mf(mpg ~ ., data=mtcars)
+
+    expect_is(xy, "list")
+    expect_is(xy$x, "matrix")
+    expect_is(xy$y, "numeric")
+    expect_true(all(xy$weights == 1))
+    expect_null(xy$offset)
+    expect_is(xy$terms, "call")
 })
 
 
-test_that("simple and base model matrix agree", {
-    mod1.1 <- glmnet(mpg ~ ., data=mtcars, use.model.frame=TRUE)
-    mod1.2 <- glmnet(mpg ~ ., data=mtcars, use.model.frame=FALSE)
-    expect_equal(mod1.1$beta, mod1.2$beta)
+test_that("standard and simple model frame agree", {
+    xy0 <- std_mf(mpg ~ ., data=mtcars)
+    xy1 <- simple_mf(mpg ~ ., data=mtcars)
 
-    mod2.1 <- glmnet(mpg ~ ., data=mtcars, sparse=TRUE, use.model.frame=TRUE)
-    mod2.2 <- glmnet(mpg ~ ., data=mtcars, sparse=TRUE, use.model.frame=FALSE)
-    expect_equal(mod2.1$beta, mod2.2$beta)
+    expect_equivalent(xy0$x, xy1$x)
+    expect_equivalent(xy0$y, xy1$y)
 })
 
 
 test_that("optional arguments work", {
-    x <- as.matrix(iris[-5])
-    y <- iris$Species
-    mod1.0 <- glmnet(x, y, family="multinomial")
-    mod1.1 <- glmnet(Species ~ ., data=iris, family="multinomial", use.model.frame=TRUE)
-    mod1.2 <- glmnet(Species ~ ., data=iris, family="multinomial", use.model.frame=FALSE)
-    expect_equal(mod1.0$beta, mod1.1$beta)
-    expect_equal(mod1.1$beta, mod1.2$beta)
+    xy1.0 <- std_mf(mpg ~ ., data=mtcars, weights=wt, offset=drat, sparse=TRUE)
+    xy1.1 <- simple_mf(mpg ~ ., data=mtcars, weights=wt, offset=drat, sparse=TRUE)
 
-    x <- as.matrix(mtcars[-1])
-    y <- mtcars$mpg
-    mod2.0 <- glmnet(x, y, alpha=0.5)
-    mod2.1 <- glmnet(mpg ~ ., data=mtcars, alpha=0.5, use.model.frame=TRUE)
-    mod2.2 <- glmnet(mpg ~ ., data=mtcars, alpha=0.5, use.model.frame=FALSE)
-    expect_equal(mod2.0$beta, mod2.1$beta)
-    expect_equal(mod2.1$beta, mod2.2$beta)
+    expect_s4_class(xy1.0$x, "Matrix")
+    expect_s4_class(xy1.1$x, "Matrix")
 
-    x <- as.matrix(mtcars[c("cyl", "disp", "hp", "drat")])
-    y <- mtcars$mpg
-    w <- mtcars$wt
-    mod3.0 <- glmnet(x, y, weights=w)
-    mod3.1 <- glmnet(mpg ~ cyl + disp + hp + drat, data=mtcars, weights=wt, use.model.frame=TRUE)
-    mod3.2 <- glmnet(mpg ~ cyl + disp + hp + drat, data=mtcars, weights=wt, use.model.frame=FALSE)
-    expect_equal(mod3.0$beta, mod3.1$beta)
-    expect_equal(mod3.1$beta, mod3.2$beta)
-
-    data(Boston, package="MASS")
-    x <- model.matrix(~ ., Boston[1:3])[, -1]
-    y <- Boston$medv
-    ofs <- Boston$lstat
-    mod4.0 <- glmnet(x, y, offset=log(ofs))
-    mod4.1 <- glmnet(medv ~ crim + zn + indus, data=Boston, offset=log(lstat), use.model.frame=TRUE)
-    mod4.2 <- glmnet(medv ~ crim + zn + indus, data=Boston, offset=log(lstat), use.model.frame=FALSE)
-    expect_equal(mod4.0$beta, mod4.1$beta)
-    expect_equal(mod4.1$beta, mod4.2$beta)
-
-    data(Insurance, package="MASS")
-    x <- model.matrix(~ 0 + District, Insurance)
-    y <- Insurance$Claims
-    mod5.0 <- glmnet(x, y, family="poisson")
-    mod5.1 <- glmnet(Claims ~ District, data=Insurance, family="poisson")
-    expect_equal(mod5.0$beta, mod5.1$beta)
+    expect_equivalent(xy1.0$x, xy1.1$x)
+    expect_equivalent(xy1.0$weights, xy1.1$weights)
+    expect_equivalent(xy1.0$offset, xy1.1$offset)
 })
 
 
-test_that("model fitting with NA works", {
-    irisNA <- iris
-    irisNA[1, 1] <- NA
-    x <- as.matrix(irisNA[-5])
-    y <- irisNA$Species
-    expect_error(glmnet(x, y, family="multinomial"))
-    expect_error(glmnet(Species ~ ., data=irisNA, family="multinomial", use.model.frame=FALSE, na.action=na.fail))
-    expect_error(glmnet(Species ~ ., data=irisNA, family="multinomial", use.model.frame=TRUE, na.action=na.fail))
+test_that("factor handling works", {
+    data(Insurance, package="MASS")
+    # don't worry about ordered factors for now
+    class(Insurance$Group) <- "factor"
+    class(Insurance$Age) <- "factor"
+    xy <- simple_mf(Claims ~ District + Group + Age, data=Insurance)
+    nlevs <- with(Insurance, nlevels(District) + nlevels(Group) + nlevels(Age))
 
-    # use alpha=0 so that column with NA doesn't get dropped from model
-    mod1.0 <- glmnet(x[-1, ], y[-1], family="multinomial", alpha=0)
-    mod1.1 <- glmnet(Species ~ ., data=irisNA, family="multinomial", alpha=0, use.model.frame=FALSE)
-    mod1.2 <- glmnet(Species ~ ., data=irisNA, family="multinomial", alpha=0, use.model.frame=TRUE)
-    expect_equal(mod1.0$beta, mod1.1$beta)
-    expect_equal(mod1.1$beta, mod1.2$beta)
+    expect_equal(ncol(xy$x), nlevs)
+    expect_true(all(range(xy$x) == c(0, 1)))
+})
+
+
+test_that("NA handling works", {
+    mtcarsNA <- mtcars
+    mtcarsNA[1, ] <- NA
+
+    expect_error(std_mf(mpg  ~ ., data=mtcarsNA, na.action=na.fail))
+    expect_error(simple_mf(mpg  ~ ., data=mtcarsNA, na.action=na.fail))
+
+    xy1.0 <- std_mf(mpg  ~ ., data=mtcarsNA, weights=wt, offset=log(drat), na.action=na.omit)
+    xy1.1 <- simple_mf(mpg  ~ ., data=mtcarsNA, weights=wt, offset=log(drat), na.action=na.omit)
+    expect_equivalent(xy1.0$x, xy1.1$x)
+    expect_equivalent(xy1.0$y, xy1.1$y)
+    expect_equivalent(xy1.0$weights, xy1.1$weights)
+    expect_equivalent(xy1.0$offset, xy1.1$offset)
+
+    xy2.0 <- std_mf(mpg  ~ ., data=mtcarsNA, weights=wt, offset=log(drat), na.action=na.exclude)
+    xy2.1 <- simple_mf(mpg  ~ ., data=mtcarsNA, weights=wt, offset=log(drat), na.action=na.exclude)
+    expect_equivalent(xy2.0$x, xy2.1$x)
+    expect_equivalent(xy2.0$y, xy2.1$y)
+    expect_equivalent(xy2.0$weights, xy2.1$weights)
+    expect_equivalent(xy2.0$offset, xy2.1$offset)
+
+    xy3.0 <- std_mf(mpg  ~ ., data=mtcarsNA, weights=wt, offset=log(drat), na.action=na.pass)
+    xy3.1 <- simple_mf(mpg  ~ ., data=mtcarsNA, weights=wt, offset=log(drat), na.action=na.pass)
+    expect_equivalent(xy3.0$x, xy3.1$x)
+    expect_equivalent(xy3.0$y, xy3.1$y)
+    expect_equivalent(xy3.0$weights, xy3.1$weights)
+    expect_equivalent(xy3.0$offset, xy3.1$offset)
 })
 

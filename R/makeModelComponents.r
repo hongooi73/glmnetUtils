@@ -110,11 +110,11 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     weightVals <- data$weightVals
 
     matrs <- sapply(rhsVars, function(x) {
-        if(is.numeric(data[[x]]) || is.logical(data[[x]]))
-            data[[x]]
-        else if(sparse)
+        if(sparse)
             Matrix::sparse.model.matrix(formula(paste("~ 0 +", x)), data,
                 drop.unused.levels=drop.unused.levels, xlev=xlev)
+        else if(is.numeric(data[[x]]) || is.logical(data[[x]]))
+            data[[x]]
         else model.matrix(formula(paste("~ 0 +", x)), data,
                 drop.unused.levels=drop.unused.levels, xlev=xlev)
     }, simplify=FALSE)
