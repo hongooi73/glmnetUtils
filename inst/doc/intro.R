@@ -1,5 +1,6 @@
 ## ---- echo=FALSE---------------------------------------------------------
 library(glmnetUtils)
+library(MASS)
 
 ## ------------------------------------------------------------------------
 # least squares regression
@@ -63,14 +64,17 @@ summary(as.numeric(predict(mtcarsMod, mtcars) -
 ## ---- eval=FALSE---------------------------------------------------------
 #  glmnet(y ~ ., df4, use.model.frame=FALSE)
 
-## ---- echo=FALSE---------------------------------------------------------
-if(!file.exists("~/Leukemia.rdata"))
-    download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData", "~/Leukemia.rdata", mode="wb")
+## ---- echo = FALSE-------------------------------------------------------
+leukFile <- file.path(tempdir(), "Leukemia.rdata")
+if(!file.exists(leukFile))
+{
+    download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData", leukFile, mode = "wb")
+}
+load(leukFile)
 
 ## ------------------------------------------------------------------------
 # Leukemia dataset from Trevor Hastie's website:
 # http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData
-load("~/Leukemia.rdata")
 leuk <- do.call(data.frame, Leukemia)
 
 leukMod <- cvAlpha.glmnet(y ~ ., data=leuk, family="binomial")

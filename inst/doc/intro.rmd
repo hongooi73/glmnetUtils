@@ -9,6 +9,7 @@ vignette: >
 
 ```{r, echo=FALSE}
 library(glmnetUtils)
+library(MASS)
 ```
 
 The [glmnetUtils package](https://github.com/hong-revo/glmnetUtils) provides a collection of tools to streamline the process of fitting elastic net models with [glmnet](https://cran.r-project.org/package=glmnet). I wrote the package after a couple of projects where I found myself writing the same boilerplate code to convert a data frame into a predictor matrix and a response vector. In addition to providing a formula interface, it also features a function `cvAlpha.glmnet` to do crossvalidation for both $\alpha$ and $\lambda$, as well as some utility functions.
@@ -162,15 +163,18 @@ As an option, glmnetUtils can also generate a _sparse_ model matrix, using the `
 
 One piece missing from the standard glmnet package is a way of choosing $\alpha$, the elastic net mixing parameter, similar to how `cv.glmnet` chooses $\lambda$, the shrinkage parameter. To fix this, glmnetUtils provides the `cvAlpha.glmnet` function, which uses crossvalidation to examine the impact on the model of changing $\alpha$ and $\lambda$. The interface is the same as for the other functions:
 
-```{r, echo=FALSE}
-if(!file.exists("~/Leukemia.rdata"))
-    download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData", "~/Leukemia.rdata", mode="wb")
+```{r, echo = FALSE}
+leukFile <- file.path(tempdir(), "Leukemia.rdata")
+if(!file.exists(leukFile))
+{
+    download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData", leukFile, mode = "wb")
+}
+load(leukFile)
 ```
 
 ```{r}
 # Leukemia dataset from Trevor Hastie's website:
 # http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData
-load("~/Leukemia.rdata")
 leuk <- do.call(data.frame, Leukemia)
 
 leukMod <- cvAlpha.glmnet(y ~ ., data=leuk, family="binomial")
