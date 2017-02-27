@@ -42,7 +42,7 @@ makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subs
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
     if(is.null(weights))
-        weights <- rep(1, length(y))
+        weights <- rep(1, nrow(mf))
 
     list(x=x, y=y, weights=weights, offset=offset, terms=terms(mf))
 }
@@ -99,12 +99,12 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         na.action <- get(na.action, mode="function")
     if(!is.null(offset))
     {
-        data <- na.action(cbind(data[c(lhsVars, rhsVars)], offsetVals, weightVals))
+        data <- na.action(cbind.data.frame(data[c(lhsVars, rhsVars)], offsetVals, weightVals))
         offsetVals <- data$offsetVals
     }
     else
     {
-        data <- na.action(cbind(data[c(lhsVars, rhsVars)], weightVals))
+        data <- na.action(cbind.data.frame(data[c(lhsVars, rhsVars)], weightVals))
         offsetVals <- NULL
     }
     weightVals <- data$weightVals

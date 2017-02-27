@@ -99,3 +99,15 @@ test_that("prediction with NA works", {
     expect_equivalent(pred1.3, pred1.4)
     expect(all(is.na(pred1.3[1, ])), "NAs dropped with na.pass")
 })
+
+
+test_that("matrix y works", {
+    df <- data.frame(x1 = rnorm(100), x2 = rnorm(100), y = rbinom(100, 10, 0.5))
+    df$ny <- 10 - df$y
+    mod1.1 <- glmnet(cbind(ny, y) ~ x1 + x2, data = df, family = "binomial", use.model.frame = TRUE)
+    mod1.2 <- glmnet(cbind(ny, y) ~ x1 + x2, data = df, family = "binomial", use.model.frame = FALSE)
+
+    pred1.1 <- predict(mod1.1, df)
+    pred1.2 <- predict(mod1.2, df)
+    expect_equivalent(pred1.1, pred1.2)
+})
