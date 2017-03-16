@@ -23,7 +23,7 @@ Maintainer: Hong Ooi <hongooi@microsoft.com>
 NeedsCompilation: no
 VignetteBuilder: knitr
 Copyright: Microsoft
-License: MIT + file LICENSE
+License: GPL-2
 Collate:
     'glmnetUtils.r'
     'cvAlpha.r'
