@@ -47,7 +47,6 @@ local.properties
 *.sln.docstates
 *.Rsuo
 *.Rsln
-*.rproj
 
 # Build results
 
