@@ -1,6 +1,6 @@
 Package: glmnetUtils
 Type: Package
-Version: 1.0.1
+Version: 1.0.2
 Title: Utilities for 'Glmnet'
 Description: Provides a formula interface for the 'glmnet' package for
     elasticnet regression, a method for cross-validating the alpha parameter,
