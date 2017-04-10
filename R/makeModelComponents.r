@@ -36,8 +36,8 @@ makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subs
     mf <- eval.parent(cl)
 
     x <- if(!is.null(sparse) && sparse)
-        Matrix::sparse.model.matrix(attr(mf, "terms"), mf, xlev=xlev)[, -1, drop=FALSE]
-    else model.matrix(attr(mf, "terms"), mf, xlev=xlev)[, -1, drop=FALSE]
+        Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1, drop=FALSE]
+    else model.matrix(attr(mf, "terms"), mf)[, -1, drop=FALSE]
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
