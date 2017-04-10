@@ -141,6 +141,7 @@ cvAlpha.glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL
     model <- cvAlpha.glmnet.default(xy$x, xy$y, weights=xy$weights, offset=xy$offset, ...)
     model$call <- match.call()
     model$terms <- xy$terms
+    model$xlev <- xy$xlev
     model$sparse <- sparse
     model$use.model.frame <- use.model.frame
     model$na.action <- na.action
@@ -185,8 +186,10 @@ predict.cvAlpha.glmnet.formula <- function(object, newdata, alpha, which=match(T
 {
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
-    cl$formula <- object$terms
+    cl$formula <- delete.response(object$terms)
     cl$data <- cl$newdata
+    cl$newdata <- NULL
+    cl$xlev <- object$xlev
     cl[[1]] <- if(object$use.model.frame)
         makeModelComponentsMF
     else makeModelComponents

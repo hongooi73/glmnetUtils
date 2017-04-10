@@ -36,15 +36,16 @@ makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subs
     mf <- eval.parent(cl)
 
     x <- if(!is.null(sparse) && sparse)
-        Matrix::sparse.model.matrix(attr(mf, "terms"), mf)[, -1, drop=FALSE]
-    else model.matrix(attr(mf, "terms"), mf)[, -1, drop=FALSE]
+        Matrix::sparse.model.matrix(attr(mf, "terms"), mf, xlev=xlev)[, -1, drop=FALSE]
+    else model.matrix(attr(mf, "terms"), mf, xlev=xlev)[, -1, drop=FALSE]
     y <- model.response(mf)
     weights <- model.extract(mf, "weights")
     offset <- model.extract(mf, "offset")
     if(is.null(weights))
         weights <- rep(1, nrow(mf))
+    xlev <- .getXlevels(attr(mf, "terms"), mf)
 
-    list(x=x, y=y, weights=weights, offset=offset, terms=terms(mf))
+    list(x=x, y=y, weights=weights, offset=offset, terms=terms(mf), xlev=xlev)
 }
 
 
@@ -110,18 +111,29 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     weightVals <- data$weightVals
 
     matrs <- sapply(rhsVars, function(x) {
-        if(sparse)
+        out <- if(sparse)
             Matrix::sparse.model.matrix(formula(paste("~ 0 +", x)), data,
                 drop.unused.levels=drop.unused.levels, xlev=xlev)
         else if(is.numeric(data[[x]]) || is.logical(data[[x]]))
             data[[x]]
         else model.matrix(formula(paste("~ 0 +", x)), data,
                 drop.unused.levels=drop.unused.levels, xlev=xlev)
+
+        # store levels of x
+        attr(out, "xlev") <- if(is.numeric(data[[x]]) || is.logical(data[[x]]))
+            NULL
+        else if(is.factor(data[[x]]))
+            levels(data[[x]])
+        else sort(unique(data[[x]]))
+
+        out
     }, simplify=FALSE)
 
     # cut-down version of real terms object: an (unevaluated) call object containing a formula
     terms <- parse(text=paste("~", paste(tickQuote(rhsVars), collapse="+")))[[1]]
     environment(terms) <- NULL  # ensure we don't save tons of crap by accident
 
-    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=terms)
+    xlev <- lapply(matrs, function(m) attr(m, "xlev"))
+
+    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=terms, xlev=xlev)
 }

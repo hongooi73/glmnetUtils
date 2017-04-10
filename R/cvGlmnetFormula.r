@@ -68,13 +68,14 @@ cv.glmnet.formula <- function(formula, data, alpha=1, nfolds=10, ..., weights=NU
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
     cl[[1]] <- if(use.model.frame)
-        makeModelComponentsMF
-    else makeModelComponents
+        quote(glmnetUtils::makeModelComponentsMF)
+    else quote(glmnetUtils::makeModelComponents)
     xy <- eval.parent(cl)
 
     model <- glmnet::cv.glmnet(xy$x, xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
     model$call <- match.call()
     model$terms <- xy$terms
+    model$xlev <- xy$xlev
     model$alpha <- alpha
     model$nfolds <- nfolds
     model$sparse <- sparse
@@ -97,11 +98,13 @@ predict.cv.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
 
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
-    cl$formula <- object$terms
+    cl$formula <- delete.response(object$terms)
     cl$data <- cl$newdata
+    cl$newdata <- NULL
+    cl$xlev <- object$xlev
     cl[[1]] <- if(object$use.model.frame)
-        makeModelComponentsMF
-    else makeModelComponents
+        quote(glmnetUtils::makeModelComponentsMF)
+    else quote(glmnetUtils::makeModelComponents)
     xy <- eval.parent(cl)
     x <- xy$x
     offset <- xy$offset
