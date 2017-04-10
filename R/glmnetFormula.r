@@ -67,8 +67,8 @@ glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NUL
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
     cl[[1]] <- if(use.model.frame)
-        quote(glmnetUtils::makeModelComponentsMF)
-    else quote(glmnetUtils::makeModelComponents)
+        makeModelComponentsMF
+    else makeModelComponents
     xy <- eval.parent(cl)
 
     model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
@@ -102,8 +102,8 @@ predict.glmnet.formula <- function(object, newdata, offset=NULL, na.action=na.pa
     cl$newdata <- NULL
     cl$xlev <- object$xlev
     cl[[1]] <- if(object$use.model.frame)
-        quote(glmnetUtils::makeModelComponentsMF)
-    else quote(glmnetUtils::makeModelComponents)
+        glmnetUtils::makeModelComponentsMF
+    else makeModelComponents
     xy <- eval.parent(cl)
     x <- xy$x
     offset <- xy$offset
