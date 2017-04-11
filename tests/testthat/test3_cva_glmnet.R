@@ -1,8 +1,8 @@
-context("cvAlpha.glmnet")
+context("cva.glmnet")
 
 data(Boston, package="MASS")
 set.seed(898989)
-Bos_cva0 <- cvAlpha.glmnet(medv ~ ., data=Boston)
+Bos_cva0 <- cva.glmnet(medv ~ ., data=Boston)
 Bos_cva0_m <- sapply(Bos_cva0$modlist, function(x) x$cvm)
 
 
@@ -46,8 +46,8 @@ cl <- parallel::makeCluster(2)
 
 test_that("parallel backend works", {
     set.seed(898989)
-    Bos_cva1 <- cvAlpha.glmnet(medv ~ ., data=Boston, outerParallel=cl)
-    expect_s3_class(Bos_cva1, "cvAlpha.glmnet.formula")
+    Bos_cva1 <- cva.glmnet(medv ~ ., data=Boston, outerParallel=cl)
+    expect_s3_class(Bos_cva1, "cva.glmnet.formula")
 
     Bos_cva1_m <- sapply(Bos_cva1$modlist, function(x) x$cvm)
     expect_equal(Bos_cva0_m, Bos_cva1_m)
@@ -60,8 +60,8 @@ test_that("Revo backend works", {
     doParallel::registerDoParallel(cl)
 
     set.seed(898989)
-    Bos_cva2 <- cvAlpha.glmnet(medv ~ ., data=Boston, outerParallel="dopar")
-    expect_s3_class(Bos_cva2, "cvAlpha.glmnet.formula")
+    Bos_cva2 <- cva.glmnet(medv ~ ., data=Boston, outerParallel="dopar")
+    expect_s3_class(Bos_cva2, "cva.glmnet.formula")
 
     Bos_cva2_m <- sapply(Bos_cva2$modlist, function(x) x$cvm)
     expect_equal(Bos_cva0_m, Bos_cva2_m)
@@ -71,7 +71,7 @@ test_that("Revo backend works", {
 test_that("inner and outer parallel triggers warning", {
     skip_if_not_installed("doParallel")
     doParallel::registerDoParallel(cl)
-    expect_warning(cvAlpha.glmnet(medv ~ ., data=Boston, parallel=TRUE, outerParallel=cl))
+    expect_warning(cva.glmnet(medv ~ ., data=Boston, parallel=TRUE, outerParallel=cl))
 })
 
 parallel::stopCluster(cl)

@@ -57,11 +57,11 @@ test_that("mismatched factor levels work, cv.glmnet", {
 })
 
 
-test_that("mismatched factor levels work, cvAlpha.glmnet", {
+test_that("mismatched factor levels work, cva.glmnet", {
     df <- data.frame(y=rnorm(100), x=sample(letters[11:14], replace=TRUE, size=100))
     l <- 10^seq(-4, -1, len=101)
-    m0 <- cvAlpha.glmnet(y ~ x, df, lambda=l, use.model.frame=TRUE)
-    m1 <- cvAlpha.glmnet(y ~ x, df, lambda=l, use.model.frame=FALSE)
+    m0 <- cva.glmnet(y ~ x, df, lambda=l, use.model.frame=TRUE)
+    m1 <- cva.glmnet(y ~ x, df, lambda=l, use.model.frame=FALSE)
 
     newdf1a <- data.frame(x=letters[11:14], stringsAsFactors=FALSE)
     newdf1b <- data.frame(x=letters[11:14], stringsAsFactors=TRUE)

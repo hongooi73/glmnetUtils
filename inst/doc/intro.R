@@ -77,7 +77,7 @@ load(leukFile)
 # http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData
 leuk <- do.call(data.frame, Leukemia)
 
-leukMod <- cvAlpha.glmnet(y ~ ., data=leuk, family="binomial")
+leukMod <- cva.glmnet(y ~ ., data=leuk, family="binomial")
 leukMod
 
 ## ---- fig.height=5, fig.width=7------------------------------------------

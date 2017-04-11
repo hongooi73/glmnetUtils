@@ -26,8 +26,8 @@ Copyright: Microsoft
 License: GPL-2
 Collate:
     'glmnetUtils.r'
-    'cvAlpha.r'
     'cvGlmnetFormula.r'
+    'cvaGlmnetFormula.r'
     'glmnetFormula.r'
     'makeModelComponents.r'
 RoxygenNote: 5.0.1
