@@ -19,5 +19,5 @@ NULL
 ## assorted imports from base packages
 #' @importFrom graphics lines plot
 #' @importFrom grDevices palette topo.colors
-#' @importFrom stats coef model.extract model.matrix model.response na.pass predict terms
+#' @importFrom stats coef model.extract model.matrix model.response na.pass predict terms .getXlevels delete.response
 NULL

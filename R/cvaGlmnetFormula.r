@@ -250,7 +250,6 @@ plot.cva.glmnet <- function(x, ...)
     cvm <- sapply(x$modlist, "[[", "cvm", simplify=FALSE)
     oldPal <- palette(topo.colors(n))
     on.exit(palette(oldPal))
-    rng <- do.call(range, cvm)
     ylab <- x$modlist[[1]]$name
     xlst <- lapply(x$modlist, "[[", "lambda")
     ylst <- lapply(x$modlist, "[[", "cvm")

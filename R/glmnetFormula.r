@@ -102,7 +102,7 @@ predict.glmnet.formula <- function(object, newdata, offset=NULL, na.action=na.pa
     cl$newdata <- NULL
     cl$xlev <- object$xlev
     cl[[1]] <- if(object$use.model.frame)
-        glmnetUtils::makeModelComponentsMF
+        makeModelComponentsMF
     else makeModelComponents
     xy <- eval.parent(cl)
     x <- xy$x
