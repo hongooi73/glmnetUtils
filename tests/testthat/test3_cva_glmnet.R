@@ -42,6 +42,19 @@ test_that("prediction with NA works", {
 })
 
 
+test_that("specifying foldid, nfolds works", {
+    set.seed(898989)
+    mod1 <- cva.glmnet(medv ~ ., data=Boston, nfolds=5)
+    set.seed(898989)
+    id <- sample(1:5, nrow(Boston), replace=TRUE)
+    mod2 <- cva.glmnet(medv ~ ., data=Boston, nfolds=5, foldid=id)
+
+    mod1c <- coef(mod1, alpha=1)
+    mod2c <- coef(mod2, alpha=1)
+    expect_equal(mod1c, mod2c)
+})
+
+
 cl <- parallel::makeCluster(2)
 
 test_that("parallel backend works", {

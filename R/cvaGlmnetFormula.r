@@ -12,6 +12,7 @@ UseMethod("cva.glmnet")
 #' @param y A response vector or matrix (for a multinomial response).
 #' @param alpha A vector of alpha values for which to do cross-validation. The default is a sequence of 11 values more closely spaced around alpha = 0. For the \code{predict} and \code{coef} methods, the specific value of alpha for which to return predictions/regression coefficients.
 #' @param nfolds The number of cross-validation folds to use. Defaults to 10.
+#' @param foldid Vector of cross-validation folds. See \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}}.
 #' @param outerParallel Method of parallelising the outer loop over alpha. See 'Details' below. If \code{NULL}, the loop is run sequentially.
 #' @param checkInnerParallel If the outer loop is run in parallel, check that the inner loop over lambda will not be in contention for cores.
 #'
@@ -32,8 +33,8 @@ UseMethod("cva.glmnet")
 #' @importFrom parallel parLapply
 #' @importFrom glmnet cv.glmnet
 #' @export
-cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, ..., outerParallel=NULL,
-                                   checkInnerParallel=TRUE)
+cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, foldid=sample(nfolds, nrow(x), replace=TRUE),
+                               ..., outerParallel=NULL, checkInnerParallel=TRUE)
 {
     .cvfunc <- function(a, xmat, y, nfolds, foldid, ...)
     {
@@ -49,7 +50,9 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, ..., 
         }
     }
 
-    foldid <- sample(nfolds, nrow(x), replace=TRUE)
+    #foldid <- sample(nfolds, nrow(x), replace=TRUE)
+    if(length(foldid) != nrow(x) || !is.numeric(foldid))
+        stop("invalid foldid specified")
     dotargs <- list(...)
 
     # do not explicitly import RevoScaleR; this allows use with non-Microsoft R installs

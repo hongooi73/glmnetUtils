@@ -16,7 +16,8 @@
 cva.glmnet(x, ...)
 
 \method{cva.glmnet}{default}(x, y, alpha = seq(0, 1, len = 11)^3,
-  nfolds = 10, ..., outerParallel = NULL, checkInnerParallel = TRUE)
+  nfolds = 10, foldid = sample(nfolds, nrow(x), replace = TRUE), ...,
+  outerParallel = NULL, checkInnerParallel = TRUE)
 
 \method{cva.glmnet}{formula}(formula, data, ..., weights = NULL,
   offset = NULL, subset = NULL, na.action = getOption("na.action"),
@@ -51,6 +52,8 @@ minlossplot(x, ...)
 \item{alpha}{A vector of alpha values for which to do cross-validation. The default is a sequence of 11 values more closely spaced around alpha = 0. For the \code{predict} and \code{coef} methods, the specific value of alpha for which to return predictions/regression coefficients.}
 
 \item{nfolds}{The number of cross-validation folds to use. Defaults to 10.}
+
+\item{foldid}{Vector of cross-validation folds. See \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}}.}
 
 \item{outerParallel}{Method of parallelising the outer loop over alpha. See 'Details' below. If \code{NULL}, the loop is run sequentially.}
 
