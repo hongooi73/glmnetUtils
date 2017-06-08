@@ -24,6 +24,7 @@ NeedsCompilation: no
 VignetteBuilder: knitr
 Copyright: Microsoft
 License: GPL-2
+URL: https://github.com/Hong-Revo/glmnetUtils
 Collate:
     'glmnetUtils.r'
     'cvGlmnetFormula.r'

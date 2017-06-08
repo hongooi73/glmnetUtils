@@ -53,6 +53,11 @@ makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subs
 makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
                                 drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, ...)
 {
+    if(!is.data.frame(data))
+    {
+        data <- as.data.frame(data)
+        warning("input data was converted to data.frame")
+    }
     tickQuote <- function(x)
         paste0("`", x, "`")
 
@@ -100,6 +105,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         na.action <- get(na.action, mode="function")
     if(!is.null(offset))
     {
+        # explicitly call cbind.data.frame to deal with tibbles
         data <- na.action(cbind.data.frame(data[c(lhsVars, rhsVars)], offsetVals, weightVals))
         offsetVals <- data$offsetVals
     }
