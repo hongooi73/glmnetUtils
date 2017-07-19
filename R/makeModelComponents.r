@@ -118,11 +118,11 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
     matrs <- sapply(rhsVars, function(x) {
         out <- if(sparse)
-            Matrix::sparse.model.matrix(formula(paste("~ 0 +", x)), data,
+            Matrix::sparse.model.matrix(formula(paste("~ 0 +", tickQuote(x))), data,
                 drop.unused.levels=drop.unused.levels, xlev=xlev)
         else if(is.numeric(data[[x]]) || is.logical(data[[x]]))
             data[[x]]
-        else model.matrix(formula(paste("~ 0 +", x)), data,
+        else model.matrix(formula(paste("~ 0 +", tickQuote(x))), data,
                 drop.unused.levels=drop.unused.levels, xlev=xlev)
 
         # store levels of x

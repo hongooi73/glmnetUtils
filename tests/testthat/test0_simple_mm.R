@@ -80,3 +80,9 @@ test_that("NA handling works", {
     expect_equivalent(xy3.0$offset, xy3.1$offset)
 })
 
+
+test_that("nonsyntactic vars work",
+{
+    mtcars <- cbind(mtcars, `mpg+rand`=mtcars$mpg + rnorm(nrow(mtcars)), `factor(cyl)`=factor(mtcars$cyl))
+    expect_true(inherits(glmnet(mpg ~ ., data=mtcars), "glmnet.formula"))
+})
