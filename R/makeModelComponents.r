@@ -114,10 +114,12 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     rhsTerms <- additiveTerms(rhs)
     matrs <- sapply(rhsTerms, function(x) {
         xvars <- all.vars(x)
+        xnames <- all.names(x)
+        isExpr <- !identical(xvars, xnames)
         anyFactors <- any(sapply(data[xvars], function(x) is.factor(x) || is.character(x)))
 
         # only call model.matrix()/model.frame() if necessary
-        if(anyFactors || sparse)
+        if(anyFactors || isExpr || sparse)
         {
             f <- eval(call("~", substitute(0 + .x, list(.x=x))))
             mf <- model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
