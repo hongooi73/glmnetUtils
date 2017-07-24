@@ -80,12 +80,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         # this avoids possible stack overflow with large no. of terms
         rhs <- parse(text=paste("~", paste(tickQuote(rhsVars), collapse="+")))[[1]][[2]]
     }
-    rhsVars <- all.vars(rhs)
-    rhsNames <- all.names(rhs)
-
-    # only formulas of the form x1 + x2 + ... allowed, no expressions or interactions
-    if(!setequal(c("+", rhsVars), c("+", rhsNames)))
-        stop("only additive formulas allowed")
+    else rhsVars <- all.vars(rhs)
 
     if(!missing(subset))
     {
@@ -116,30 +111,53 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     }
     weightVals <- data$weightVals
 
-    matrs <- sapply(rhsVars, function(x) {
+    rhsTerms <- additiveTerms(rhs)
+    matrs <- sapply(rhsTerms, function(x) {
+        f <- eval(call("~", substitute(0 + .x, list(.x=x))))
+        mf <- model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
+
         out <- if(sparse)
-            Matrix::sparse.model.matrix(formula(paste("~ 0 +", tickQuote(x))), data,
-                drop.unused.levels=drop.unused.levels, xlev=xlev)
-        else if(is.numeric(data[[x]]) || is.logical(data[[x]]))
-            data[[x]]
-        else model.matrix(formula(paste("~ 0 +", tickQuote(x))), data,
-                drop.unused.levels=drop.unused.levels, xlev=xlev)
+            Matrix::sparse.model.matrix(terms(mf), mf, xlev=xlev)
+        else model.matrix(terms(mf), mf, xlev=xlev)
 
         # store levels of x
-        attr(out, "xlev") <- if(is.numeric(data[[x]]) || is.logical(data[[x]]))
-            NULL
-        else if(is.factor(data[[x]]))
-            levels(data[[x]])
-        else sort(unique(data[[x]]))
-
+        attr(out, "xlev") <- lapply(mf, levels)
         out
     }, simplify=FALSE)
 
-    # cut-down version of real terms object: an (unevaluated) call object containing a formula
-    terms <- parse(text=paste("~", paste(tickQuote(rhsVars), collapse="+")))[[1]]
-    environment(terms) <- NULL  # ensure we don't save tons of crap by accident
+    # cut-down version of real terms object: an (unevaluated) call object
+    # ensure we don't save tons of crap by accident
+    environment(rhs) <- NULL
 
     xlev <- lapply(matrs, function(m) attr(m, "xlev"))
 
-    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=terms, xlev=xlev)
+    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=rhs, xlev=xlev)
+}
+
+
+# get list of additive terms in a model: ~ a + b + c*d + e:f -> list(a, b, c*d, e:f)
+# without creating terms object
+additiveTerms <- function(f)
+{
+    plus <- quote(`+`)
+    minus <- quote(`-`)
+    rhs <- if(inherits(f, "formula")) f[[length(f)]] else f
+    l <- list()
+
+    # walk the parse tree
+    repeat
+    {
+        if(is.call(rhs) && (identical(rhs[[1]], plus) || identical(rhs[[1]], minus)))
+        {
+            if(identical(rhs[[1]], plus))
+                l <- c(l, rhs[3][[1]])
+            rhs <- rhs[[2]]
+        }
+        else
+        {
+            l <- c(l, rhs)
+            break
+        }
+    }
+    rev(l)
 }
