@@ -189,13 +189,14 @@ predict.cva.glmnet.formula <- function(object, newdata, alpha, which=match(TRUE,
 {
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
-    cl$formula <- delete.response(object$terms)
+    cl$formula <- makeFormulaRhs(object$terms)
     cl$data <- cl$newdata
     cl$newdata <- NULL
     cl$xlev <- object$xlev
     cl[[1]] <- if(object$use.model.frame)
         makeModelComponentsMF
     else makeModelComponents
+
     xy <- eval.parent(cl)
     x <- xy$x
     offset <- xy$offset

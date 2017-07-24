@@ -161,3 +161,12 @@ additiveTerms <- function(f)
     }
     rev(l)
 }
+
+
+makeFormulaRhs <- function(x)
+{
+    if(inherits(x, "terms"))
+        delete.response(x)
+    else delete.response(eval(call("~", x)))
+}
+
