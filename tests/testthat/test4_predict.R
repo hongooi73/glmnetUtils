@@ -24,7 +24,7 @@ test_that("mismatched factor levels work, glmnet", {
     expect_error(predict(m1, newdf2a))
     expect_error(predict(m1, newdf2b))
 
-    expect_equal(predict(m1, newdf3a), predict(m1, newdf3b))
+    expect_equal(predict(m0, newdf3a), predict(m0, newdf3b))
     expect_equal(predict(m1, newdf3a), predict(m1, newdf3b))
 })
 
@@ -52,7 +52,7 @@ test_that("mismatched factor levels work, cv.glmnet", {
     expect_error(predict(m1, newdf2a))
     expect_error(predict(m1, newdf2b))
 
-    expect_equal(predict(m1, newdf3a), predict(m1, newdf3b))
+    expect_equal(predict(m0, newdf3a), predict(m0, newdf3b))
     expect_equal(predict(m1, newdf3a), predict(m1, newdf3b))
 })
 
@@ -80,7 +80,7 @@ test_that("mismatched factor levels work, cva.glmnet", {
     expect_error(predict(m1, newdf2a, alpha=1))
     expect_error(predict(m1, newdf2b, alpha=1))
 
-    expect_equal(predict(m1, newdf3a, alpha=1), predict(m1, newdf3b, alpha=1))
+    expect_equal(predict(m0, newdf3a, alpha=1), predict(m0, newdf3b, alpha=1))
     expect_equal(predict(m1, newdf3a, alpha=1), predict(m1, newdf3b, alpha=1))
 })
 

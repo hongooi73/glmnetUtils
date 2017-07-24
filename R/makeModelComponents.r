@@ -113,15 +113,30 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
     rhsTerms <- additiveTerms(rhs)
     matrs <- sapply(rhsTerms, function(x) {
-        f <- eval(call("~", substitute(0 + .x, list(.x=x))))
-        mf <- model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
+        xvars <- all.vars(x)
+        anyFactors <- any(sapply(data[xvars], function(x) is.factor(x) || is.character(x)))
 
-        out <- if(sparse)
-            Matrix::sparse.model.matrix(terms(mf), mf, xlev=xlev)
-        else model.matrix(terms(mf), mf, xlev=xlev)
+        # only call model.matrix()/model.frame() if necessary
+        if(anyFactors || sparse)
+        {
+            f <- eval(call("~", substitute(0 + .x, list(.x=x))))
+            mf <- model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
 
-        # store levels of x
-        attr(out, "xlev") <- lapply(mf, levels)
+            out <- if(sparse)
+                Matrix::sparse.model.matrix(terms(mf), mf, xlev=xlev)
+            else model.matrix(terms(mf), mf, xlev=xlev)
+            # store levels of x
+            attr(out, "xlev") <- lapply(mf, levels)
+        }
+        else if(length(xvars) == 1)
+        {
+            # manually setting dim() is faster for a vector than calling matrix() or as.matrix()
+            out <- na.action(data[[xvars]])
+            dim(out) <- c(length(out), 1)
+            colnames(out) <- xvars
+        }
+        else out <- as.matrix(na.action(data[xvars]))
+
         out
     }, simplify=FALSE)
 
@@ -129,7 +144,8 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     # ensure we don't save tons of crap by accident
     environment(rhs) <- NULL
 
-    xlev <- lapply(matrs, function(m) attr(m, "xlev"))
+    xlev <- unlist(lapply(matrs, function(m) attr(m, "xlev")), recursive=FALSE)
+    xlev <- xlev[!duplicated(names(xlev))]
 
     list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=rhs, xlev=xlev)
 }
