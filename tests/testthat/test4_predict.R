@@ -84,3 +84,10 @@ test_that("mismatched factor levels work, cva.glmnet", {
     expect_equal(predict(m1, newdf3a, alpha=1), predict(m1, newdf3b, alpha=1))
 })
 
+
+test_that("predict with interactions/expressions works",
+{
+    m <- glmnet(mpg ~ factor(cyl) + am * vs + log(wt), data=mtcars)
+    expect_is(predict(m, mtcars), "matrix")
+})
+

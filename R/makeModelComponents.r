@@ -59,18 +59,10 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         warning("input data was converted to data.frame")
     }
 
-    if(length(formula) == 3)
-    {
-        rhs <- formula[[3]]
-        lhs <- formula[[2]]
-    }
-    else
-    {
-        rhs <- formula[[2]]
-        lhs <- NULL
-    }
-    lhsVars <- all.vars(lhs)
+    rhs <- formula[[length(formula)]]
+    lhs <- if(length(formula) == 3) formula[[2]] else NULL
 
+    lhsVars <- all.vars(lhs)
     rhsTerms <- additiveTerms(rhs, names(data)[!names(data) %in% lhsVars])
 
     # rebuild rhs to allow for . in formula
@@ -111,16 +103,20 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         xnames <- all.names(x)
         isExpr <- !identical(xvars, xnames)
         anyFactors <- any(sapply(data[xvars], function(x) is.factor(x) || is.character(x)))
-
         # only call model.matrix()/model.frame() if necessary
         if(anyFactors || isExpr || sparse)
         {
+            # keep xlevs relevant to this term
+            this <- names(xlev) %in% unique(c(deparse(x), xvars))
+            xlev <- if(any(this)) xlev[this] else NULL
+
             f <- eval(call("~", substitute(0 + .x, list(.x=x))))
             mf <- model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
 
             out <- if(sparse)
                 Matrix::sparse.model.matrix(terms(mf), mf, xlev=xlev)
             else model.matrix(terms(mf), mf, xlev=xlev)
+
             # store levels of x
             attr(out, "xlev") <- lapply(mf, levels)
         }
