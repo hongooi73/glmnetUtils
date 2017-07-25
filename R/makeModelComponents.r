@@ -73,14 +73,11 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     }
     lhsVars <- all.vars(lhs)
 
-    if(identical(quote(.), rhs))
-    {
-        rhsVars <- setdiff(names(data), lhsVars)
-        # rhs is an _unevaluated_ call object containing a formula
-        # this avoids possible stack overflow with large no. of terms
-        rhs <- parse(text=paste("~", paste(tickQuote(rhsVars), collapse="+")))[[1]][[2]]
-    }
-    else rhsVars <- all.vars(rhs)
+    rhsTerms <- additiveTerms(rhs, names(data)[!names(data) %in% lhsVars])
+
+    # rebuild rhs to allow for . in formula
+    rhs <- rebuildRhs(rhsTerms)
+    rhsVars <- all.vars(rhs)
 
     if(!missing(subset))
     {
@@ -111,8 +108,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     }
     weightVals <- data$weightVals
 
-    rhsTerms <- additiveTerms(rhs)
-    matrs <- sapply(rhsTerms, function(x) {
+    matrs <- lapply(rhsTerms, function(x) {
         xvars <- all.vars(x)
         xnames <- all.names(x)
         isExpr <- !identical(xvars, xnames)
@@ -140,7 +136,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         else out <- as.matrix(na.action(data[xvars]))
 
         out
-    }, simplify=FALSE)
+    })
 
     # cut-down version of real terms object: an (unevaluated) call object
     # ensure we don't save tons of crap by accident
@@ -155,12 +151,20 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
 # get list of additive terms in a model: ~ a + b + c*d + e:f -> list(a, b, c*d, e:f)
 # without creating terms object
-additiveTerms <- function(f)
+additiveTerms <- function(f, vars)
 {
     plus <- quote(`+`)
     minus <- quote(`-`)
+    dot <- quote(.)
     rhs <- if(inherits(f, "formula")) f[[length(f)]] else f
     l <- list()
+
+    term <- function(x)
+    {
+        if(identical(x, dot))
+            rev(lapply(vars, as.name))
+        else x
+    }
 
     # walk the parse tree
     repeat
@@ -168,12 +172,12 @@ additiveTerms <- function(f)
         if(is.call(rhs) && (identical(rhs[[1]], plus) || identical(rhs[[1]], minus)))
         {
             if(identical(rhs[[1]], plus))
-                l <- c(l, rhs[3][[1]])
+                l <- c(l, term(rhs[[3]]))
             rhs <- rhs[[2]]
         }
         else
         {
-            l <- c(l, rhs)
+            l <- c(l, term(rhs))
             break
         }
     }
@@ -181,7 +185,20 @@ additiveTerms <- function(f)
 }
 
 
-makeFormulaRhs <- function(x)
+# rebuild the rhs of a formula, from a list of terms
+# essentially the reverse of additiveTerms() above
+rebuildRhs <- function(rhs)
+{
+    expr <- rhs[[1]]
+    if(length(rhs) > 1) for(i in 2:length(rhs))
+    {
+        expr <- substitute(a + b, list(a=expr, b=rhs[[i]]))
+    }
+    expr
+}
+
+
+getTerms <- function(x)
 {
     if(inherits(x, "terms"))
         delete.response(x)

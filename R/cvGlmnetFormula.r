@@ -98,7 +98,7 @@ predict.cv.glmnet.formula <- function(object, newdata, na.action=na.pass, ...)
 
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
-    cl$formula <- makeFormulaRhs(object$terms)
+    cl$formula <- getTerms(object$terms)
     cl$data <- cl$newdata
     cl$newdata <- NULL
     cl$xlev <- object$xlev
