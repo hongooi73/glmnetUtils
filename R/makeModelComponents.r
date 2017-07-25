@@ -58,8 +58,6 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         data <- as.data.frame(data)
         warning("input data was converted to data.frame")
     }
-    tickQuote <- function(x)
-        paste0("`", x, "`")
 
     if(length(formula) == 3)
     {

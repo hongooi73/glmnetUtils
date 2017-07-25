@@ -9,8 +9,14 @@ UseMethod("cv.glmnet")
 #' @rdname cv.glmnet
 #' @method cv.glmnet default
 #' @export
-cv.glmnet.default <- function(x, ...)
-glmnet::cv.glmnet(x, ...)
+cv.glmnet.default <- function(x, y, ...)
+{
+    cl <- match.call()
+    cl[[1]] <- quote(glmnet::cv.glmnet)
+    obj <- glmnet::cv.glmnet(x, y, ...)
+    obj$call <- cl
+    obj
+}
 
 
 #' Formula interface for elastic net cross-validation with cv.glmnet

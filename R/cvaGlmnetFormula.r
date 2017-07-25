@@ -36,6 +36,8 @@ UseMethod("cva.glmnet")
 cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, foldid=sample(nfolds, nrow(x), replace=TRUE),
                                ..., outerParallel=NULL, checkInnerParallel=TRUE)
 {
+    cl <- match.call()
+
     .cvfunc <- function(a, xmat, y, nfolds, foldid, ...)
     {
         glmnet::cv.glmnet(x, y, alpha=a, nfolds=nfolds, foldid=foldid, ...)
@@ -85,7 +87,7 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, foldi
     }
     else stop("unknown value for outerParallel")
 
-    out <- list(alpha=alpha, nfolds=nfolds, modlist=lst)
+    out <- list(alpha=alpha, nfolds=nfolds, modlist=lst, call=cl)
     class(out) <- "cva.glmnet"
     out
 }

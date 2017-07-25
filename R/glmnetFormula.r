@@ -9,8 +9,14 @@ UseMethod("glmnet")
 #' @rdname glmnet
 #' @method glmnet default
 #' @export
-glmnet.default <- function(x, ...)
-glmnet::glmnet(x, ...)
+glmnet.default <- function(x, y, ...)
+{
+    cl <- match.call()
+    cl[[1]] <- quote(glmnet::glmnet)
+    obj <- glmnet::glmnet(x, y, ...)
+    obj$call <- cl
+    obj
+}
 
 
 #' Formula interface for elastic net modelling with glmnet
