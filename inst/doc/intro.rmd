@@ -76,7 +76,7 @@ This may not be appropriate for a regularised model as fit with glmnet. The regu
 
 To deal with the problems above, glmnetUtils by default will avoid using `model.frame`, instead building up the model matrix term-by-term. This avoids the memory cost of creating a `terms` object, and can be noticeably faster than the standard approach. It will also include one column in the model matrix for _all_ levels in a factor; that is, no baseline level is assumed. In this situation, the coefficients represent differences from the overall mean response, and shrinking them to zero _is_ meaningful (usually).
 
-The main downside of not using `model.frame` is that the formula can only be relatively simple. At the moment, only straightforward formulas like `y ~ x1 + x2 + ... + x_p` are handled by the code, where the x's are columns already present in the data. Interaction terms and computed expressions are not supported. Where possible, you should compute such expressions beforehand.
+This works in an additive fashion, ie the formula `~ a + b:c + d*e` is treated as consisting of three terms, `a`, `b:c` and `d*e` each of which is processed independently of the others. A dot in the formula includes all main effect terms, ie `~ . + a:b + f(x)` expands to `~ a + b + x + a:b + f(x)` (assuming a, b and x are the only columns in the data). Note that a formula like `~ (a + b) + (c + d)` will be treated as two terms, `a + b` and `c + d`.
 
 ### Speed comparisons
 
@@ -112,13 +112,13 @@ print(res, unit="s", digits=2)
 <!--- previous output -->
 ```
 ## Unit: seconds
-##                                         expr   min    lq   mean median      uq    max neval
-##   glmnet(y ~ ., df1, use.model.frame = TRUE) 0.020 0.021  0.022  0.021   0.022  0.025    10
-##  glmnet(y ~ ., df1, use.model.frame = FALSE) 0.017 0.018  0.019  0.018   0.019  0.022    10
-##   glmnet(y ~ ., df2, use.model.frame = TRUE) 3.844 4.132  4.508  4.358   4.759  5.504    10
-##  glmnet(y ~ ., df2, use.model.frame = FALSE) 3.731 3.855  4.092  3.990   4.316  4.647    10
-##   glmnet(y ~ ., df3, use.model.frame = TRUE) 8.587 8.678 10.268  9.484  10.373 17.714    10
-##  glmnet(y ~ ., df3, use.model.frame = FALSE) 3.207 3.255  3.319  3.318   3.340  3.549    10
+##                                         expr    min     lq   mean median     uq    max neval
+##   glmnet(y ~ ., df1, use.model.frame = TRUE)  0.024  0.024  0.027  0.025  0.029  0.032    10
+##  glmnet(y ~ ., df1, use.model.frame = FALSE)  0.023  0.026  0.029  0.026  0.028  0.051    10
+##   glmnet(y ~ ., df2, use.model.frame = TRUE)  3.703  3.916  4.258  4.272  4.428  5.153    10
+##  glmnet(y ~ ., df2, use.model.frame = FALSE)  3.756  3.874  4.291  4.352  4.561  5.073    10
+##   glmnet(y ~ ., df3, use.model.frame = TRUE) 11.973 12.353 13.262 13.350 13.864 14.622    10
+##  glmnet(y ~ ., df3, use.model.frame = FALSE)  4.295  4.639  4.992  4.822  5.060  6.111    10
 ```
 
 From this, we can see that for datasets with up to 1,000 predictors, both methods are about as fast as each other. However, for 10,000 predictors (not uncommon these days), the `model.frame` method takes three times as long as building the model matrix term by term.

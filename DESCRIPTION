@@ -5,14 +5,14 @@ Title: Utilities for 'Glmnet'
 Description: Provides a formula interface for the 'glmnet' package for
     elasticnet regression, a method for cross-validating the alpha parameter,
     and other quality-of-life tools.
-Imports:
+Imports: 
     stats,
     graphics,
     grDevices,
     glmnet,
     parallel,
     Matrix
-Suggests:
+Suggests: 
     knitr,
     rmarkdown,
     MASS,
@@ -25,10 +25,11 @@ VignetteBuilder: knitr
 Copyright: Microsoft
 License: GPL-2
 URL: https://github.com/Hong-Revo/glmnetUtils
-Collate:
+Collate: 
     'glmnetUtils.r'
     'cvGlmnetFormula.r'
     'cvaGlmnetFormula.r'
     'glmnetFormula.r'
     'makeModelComponents.r'
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
+Roxygen: list(markdown=TRUE)
