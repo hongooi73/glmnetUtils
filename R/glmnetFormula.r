@@ -104,7 +104,7 @@ predict.glmnet.formula <- function(object, newdata, offset=NULL, na.action=na.pa
 
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
-    cl$formula <- getTerms(object$terms)
+    cl$formula <- delete.response(object$terms)
     cl$data <- cl$newdata
     cl$newdata <- NULL
     cl$xlev <- object$xlev

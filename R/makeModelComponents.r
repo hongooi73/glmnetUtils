@@ -138,9 +138,11 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         out
     }, rhsTerms, xlev, SIMPLIFY=FALSE)
 
+    # cut-down terms object: an unevaluated formula
+    terms <- call("~", rhs)
     xlev <- lapply(matrs, attr, "xlev")
 
-    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=rhs, xlev=xlev)
+    list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=terms, xlev=xlev)
 }
 
 
@@ -151,7 +153,8 @@ additiveTerms <- function(f, vars)
     plus <- quote(`+`)
     minus <- quote(`-`)
     dot <- quote(.)
-    rhs <- if(inherits(f, "formula")) f[[length(f)]] else f
+    tilde <- quote(`~`)
+    rhs <- if(!is.symbol(f) && identical(f[[1]], tilde)) f[[length(f)]] else f
     l <- list()
 
     term <- function(x)
@@ -194,11 +197,4 @@ rebuildRhs <- function(rhs)
     expr
 }
 
-
-getTerms <- function(x)
-{
-    if(inherits(x, "terms"))
-        delete.response(x)
-    else delete.response(eval(call("~", x)))
-}
 
