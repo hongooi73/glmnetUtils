@@ -98,7 +98,13 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     }
     weightVals <- data$weightVals
 
-    matrs <- lapply(rhsTerms, function(x) {
+    # user-supplied xlev is list/NULL, turn into list of lists
+    if(length(xlev) == 0)
+        xlev <- list(NULL)
+    else if(is.list(xlev) && !is.list(xlev[[1]]))
+        xlev <- list(xlev)
+
+    matrs <- mapply(function(x, xlev) {
         xvars <- all.vars(x)
         xnames <- all.names(x)
         isExpr <- !identical(xvars, xnames)
@@ -106,10 +112,6 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         # only call model.matrix()/model.frame() if necessary
         if(anyFactors || isExpr || sparse)
         {
-            # keep xlevs relevant to this term
-            this <- names(xlev) %in% unique(c(deparse(x), xvars))
-            xlev <- if(any(this)) xlev[this] else NULL
-
             f <- eval(call("~", substitute(0 + .x, list(.x=x))))
             mf <- model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
 
@@ -130,14 +132,13 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         else out <- as.matrix(na.action(data[xvars]))
 
         out
-    })
+    }, rhsTerms, xlev, SIMPLIFY=FALSE)
 
     # cut-down version of real terms object: an (unevaluated) call object
     # ensure we don't save tons of crap by accident
     environment(rhs) <- NULL
 
-    xlev <- unlist(lapply(matrs, function(m) attr(m, "xlev")), recursive=FALSE)
-    xlev <- xlev[!duplicated(names(xlev))]
+    xlev <- lapply(matrs, attr, "xlev")
 
     list(x=do.call(cbind, matrs), y=eval(lhs, data), weights=weightVals, offset=offsetVals, terms=rhs, xlev=xlev)
 }
