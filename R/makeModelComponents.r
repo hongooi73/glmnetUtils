@@ -21,6 +21,8 @@
 #' To deal with the problems above, glmnetUtils by default will avoid using `model.frame`, instead building up the model matrix term-by-term. This avoids the memory cost of creating a `terms` object, and can be noticeably faster than the standard approach. It will also include one column in the model matrix for _all_ levels in a factor; that is, no baseline level is assumed. In this situation, the coefficients represent differences from the overall mean response, and shrinking them to zero _is_ meaningful (usually).
 #'
 #' This works in an additive fashion, ie the formula `~ a + b:c + d*e` is treated as consisting of three terms, `a`, `b:c` and `d*e` each of which is processed independently of the others. A dot in the formula includes all main effect terms, ie `~ . + a:b + f(x)` expands to `~ a + b + x + a:b + f(x)` (assuming a, b and x are the only columns in the data). Note that a formula like `~ (a + b) + (c + d)` will be treated as two terms, `a + b` and `c + d`.
+#'
+#' The code can handle fairly complex formulas, but it is not as sophisticated as base `model.frame` and `model.matrix`. In particular, terms that are to be _omitted_ from the model must be at the end of the formula: `~ . - c` works, but not `~ -c + .`.
 NULL
 
 
@@ -63,7 +65,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
     lhs <- if(length(formula) == 3) formula[[2]] else NULL
 
     lhsVars <- all.vars(lhs)
-    rhsTerms <- additiveTerms(rhs, names(data)[!names(data) %in% lhsVars])
+    rhsTerms <- additiveTerms(rhs, base::setdiff(names(data), lhsVars))
 
     # rebuild rhs to allow for . in formula
     rhs <- rebuildRhs(rhsTerms)
@@ -112,8 +114,10 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
         # only call model.matrix()/model.frame() if necessary
         if(anyFactors || isExpr || sparse)
         {
+            xlev <- xlev[names(xlev) %in% unique(c(deparse(x), xvars))]
+
             f <- eval(call("~", substitute(0 + .x, list(.x=x))))
-            mf <- stats::model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
+            mf <- model.frame(f, data, drop.unused.levels=drop.unused.levels, xlev=xlev, na.action=na.action)
 
             out <- if(sparse)
                 Matrix::sparse.model.matrix(terms(mf), mf, xlev=xlev)
@@ -133,10 +137,6 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
         out
     }, rhsTerms, xlev, SIMPLIFY=FALSE)
-
-    # cut-down version of real terms object: an (unevaluated) call object
-    # ensure we don't save tons of crap by accident
-    environment(rhs) <- NULL
 
     xlev <- lapply(matrs, attr, "xlev")
 
@@ -168,6 +168,8 @@ additiveTerms <- function(f, vars)
         {
             if(identical(rhs[[1]], plus))
                 l <- c(l, term(rhs[[3]]))
+            else if(identical(rhs[[1]], minus))
+                vars <- base::setdiff(vars, deparse(rhs[[length(rhs)]]))
             rhs <- rhs[[2]]
         }
         else

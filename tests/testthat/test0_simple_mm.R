@@ -110,3 +110,25 @@ test_that("interaction/expression terms work",
     expect_is(xy3$x, "matrix")
     expect_equal(ncol(xy3$x), 5)
 })
+
+
+test_that("xlev handling works",
+{
+    df <- data.frame(a=sample(letters[1:4], 100, replace=TRUE), b=sample(letters[5:10], 100, replace=TRUE))
+    xy1 <- simple_mf(~., data=df)
+    expect_equal(length(xy1$xlev[[1]]$a), 4)
+    expect_equal(length(xy1$xlev[[2]]$b), 6)
+
+    xy2 <- simple_mf(~., data=df, xlev=list(a=letters[1:10], b=letters[1:10]))
+    expect_equal(length(xy2$xlev[[1]]$a), 10)
+    expect_equal(length(xy2$xlev[[2]]$b), 10)
+
+    xy3 <- simple_mf(~ a + factor(b), data=df, xlev=list(a=letters[1:10], `factor(b)`=letters[1:10]))
+    expect_equal(length(xy3$xlev[[1]]$a), 10)
+    expect_equal(length(xy3$xlev[[2]]$`factor(b)`), 10)
+
+    expect_warning(xy4 <- simple_mf(~a + factor(b), data=df, xlev=list(a=letters[1:10], b=letters[1:10])))
+    expect_equal(length(xy4$xlev[[1]]$a), 10)
+    expect_equal(length(xy4$xlev[[2]]$`factor(b)`), 6)
+})
+
