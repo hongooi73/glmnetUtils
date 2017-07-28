@@ -22,6 +22,7 @@ cv.glmnet.default <- function(x, y, ...)
 #' Formula interface for elastic net cross-validation with cv.glmnet
 #'
 #' @param x For the default method, a matrix of predictor variables.
+#' @param y For the default method, a response vector or matrix (for a multinomial response).
 #' @param formula A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.
 #' @param data A data frame or matrix containing the variables in the formula.
 #' @param weights An optional vector of case weights to be used in the fitting process. If missing, defaults to an unweighted fit.

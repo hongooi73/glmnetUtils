@@ -22,6 +22,7 @@ glmnet.default <- function(x, y, ...)
 #' Formula interface for elastic net modelling with glmnet
 #'
 #' @param x For the default method, a matrix of predictor variables.
+#' @param y For the default method, a response vector or matrix (for a multinomial response).
 #' @param formula A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.
 #' @param data A data frame or matrix containing the variables in the formula.
 #' @param weights An optional vector of case weights to be used in the fitting process. If missing, defaults to an unweighted fit.
@@ -131,8 +132,8 @@ coef.glmnet.formula <- function(object, ...)
 }
 
 
-#' @param digits Significant digits in printed output
-#' @param print.deviance.ratios Whether to print the table of deviance ratios, as per [glmnet:::print.glmnet]
+#' @param digits Significant digits in printed output.
+#' @param print.deviance.ratios Whether to print the table of deviance ratios, as per [glmnet::print.glmnet].
 #' @rdname glmnet
 #' @export
 #' @method print glmnet.formula

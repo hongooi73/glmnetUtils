@@ -31,6 +31,8 @@ glmnet(x, ...)
 
 \item{...}{For \code{glmnet.formula} and \code{glmnet.default}, other arguments to be passed to \link[glmnet:glmnet]{glmnet::glmnet}; for the \code{predict} and \code{coef} methods, arguments to be passed to their counterparts in package glmnet.}
 
+\item{y}{For the default method, a response vector or matrix (for a multinomial response).}
+
 \item{formula}{A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.}
 
 \item{data}{A data frame or matrix containing the variables in the formula.}
@@ -57,9 +59,9 @@ glmnet(x, ...)
 
 \item{newdata}{For the \code{predict} method, a data frame containing the observations for which to calculate predictions.}
 
-\item{digits}{Significant digits in printed output}
+\item{digits}{Significant digits in printed output.}
 
-\item{print.deviance.ratios}{Whether to print the table of deviance ratios, as per \link[glmnet:::print.glmnet]{glmnet:::print.glmnet}}
+\item{print.deviance.ratios}{Whether to print the table of deviance ratios, as per \link[glmnet:print.glmnet]{glmnet::print.glmnet}.}
 }
 \description{
 Formula interface for elastic net modelling with glmnet

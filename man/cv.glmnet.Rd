@@ -29,6 +29,8 @@ cv.glmnet(x, ...)
 
 \item{...}{For \code{cv.glmnet.formula} and \code{cv.glmnet.default}, other arguments to be passed to \link[glmnet:cv.glmnet]{glmnet::cv.glmnet}; for the \code{predict} and \code{coef} methods, arguments to be passed to their counterparts in package glmnet.}
 
+\item{y}{For the default method, a response vector or matrix (for a multinomial response).}
+
 \item{formula}{A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.}
 
 \item{data}{A data frame or matrix containing the variables in the formula.}

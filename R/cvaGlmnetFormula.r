@@ -21,8 +21,8 @@ UseMethod("cva.glmnet")
 #'
 #' Optionally this loop over alpha can be parallelised; currently, `cva.glmnet` knows about two methods of doing so:
 #'
-#' - Via [parLapply] in the parallel package. To use this, set `outerParallel` to a valid cluster object created by [makeCluster].
-#' - Via `rxExec` as supplied by Microsoft R Server's RevoScaleR package. To use this, set `outerParallel` to a valid compute context created by `RxComputeContext`, or a character string specifying such a context.
+#' * Via [parLapply] in the parallel package. To use this, set `outerParallel` to a valid cluster object created by [makeCluster].
+#' * Via `rxExec` as supplied by Microsoft R Server's RevoScaleR package. To use this, set `outerParallel` to a valid compute context created by `RxComputeContext`, or a character string specifying such a context.
 #'
 #' If the outer loop is run in parallel, `cva.glmnet` can check if the inner loop (over lambda) is also set to run in parallel, and disable this if it would lead to contention for cores. This is done if it is likely that the parallelisation is local on a multicore machine, ie if `outerParallel` is a `SOCKcluster` object running on `"localhost"`, or if the RevoScaleR compute context is local parallel.
 #'
@@ -109,9 +109,9 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, foldi
 #' @section Value:
 #' For `cva.glmnet.default`, an object of class `cva.glmnet`. This is a list containing the following:
 #' 
-#' - `alpha` The vector of alpha values
-#' - `nfolds` The number of folds
-#' - `modlist` A list of `cv.glmnet` objects, containing the cross-validation results for each value of alpha
+#' * `alpha` The vector of alpha values
+#' * `nfolds` The number of folds
+#' * `modlist` A list of `cv.glmnet` objects, containing the cross-validation results for each value of alpha
 #' 
 #' The function `cva.glmnet.formula` adds a few more components to the above, to facilitate working with formulas.
 #'
