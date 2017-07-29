@@ -104,7 +104,7 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, foldi
 #' @param use.model.frame Should the base [model.frame] function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid `model.frame` and construct the model matrix term-by-term; see [discussion][glmnet.model.matrix].
 #'
 #' @details
-#' The formula method works in a similar manner to `lm`, `glm` and other modelling functions. The arguments are used to generate a _model frame_, which is a data frame augmented with information about the roles the columns play in fitting the model. This is then turned into a _model matrix_ and a response vector, which are passed to `glmnet::cv.glmnet` along with any arguments in `...`. If `sparse` is TRUE, then `Matrix::sparse.model.matrix` is used instead of `stats::model.matrix` to create the model matrix.
+#' There are two ways in which the matrix of predictors can be generated. The default, with `use.model.frame = FALSE`, is to process the additive terms in the formula independently. With wide datasets, this is much faster and more memory-efficient than the standard R approach which uses the `model.frame` and `model.matrix` functions. However, the resulting model object is not exactly the same as if the standard approach had been used; in particular, it lacks a bona fide [terms] object. If you require interoperability with other packages that assume the standard model object structure, set `use.model.frame = TRUE`. See [discussion][glmnet.model.matrix] for more information on this topic.
 #'
 #' @section Value:
 #' For `cva.glmnet.default`, an object of class `cva.glmnet`. This is a list containing the following:

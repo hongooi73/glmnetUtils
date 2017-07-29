@@ -28,5 +28,7 @@ This may not be appropriate for a regularised model as fit with glmnet. The regu
 To deal with the problems above, glmnetUtils by default will avoid using \code{model.frame}, instead building up the model matrix term-by-term. This avoids the memory cost of creating a \code{terms} object, and can be noticeably faster than the standard approach. It will also include one column in the model matrix for \emph{all} levels in a factor; that is, no baseline level is assumed. In this situation, the coefficients represent differences from the overall mean response, and shrinking them to zero \emph{is} meaningful (usually).
 
 This works in an additive fashion, ie the formula \code{~ a + b:c + d*e} is treated as consisting of three terms, \code{a}, \code{b:c} and \code{d*e} each of which is processed independently of the others. A dot in the formula includes all main effect terms, ie \code{~ . + a:b + f(x)} expands to \code{~ a + b + x + a:b + f(x)} (assuming a, b and x are the only columns in the data). Note that a formula like \code{~ (a + b) + (c + d)} will be treated as two terms, \code{a + b} and \code{c + d}.
+
+The code can handle fairly complex formulas, but it is not as sophisticated as base \code{model.frame} and \code{model.matrix}. In particular, terms that are to be \emph{omitted} from the model must be at the end of the formula: \code{~ . - c} works, but not \code{~ -c + .}.
 }
 
