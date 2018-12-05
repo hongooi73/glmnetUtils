@@ -44,6 +44,17 @@ test_that("predict and coef work", {
 })
 
 
+test_that("nfolds arg works", {
+    set.seed(12345)
+    Bos_cv3 <- cv.glmnet(crim ~ ., data=Boston, alpha=0.5, nfolds=10)
+    expect_equal(coef(Bos_cv0, s="lambda.min"), coef(Bos_cv3, s="lambda.min"))
+
+    set.seed(12345)
+    Bos_cv4 <- cv.glmnet(crim ~ ., data=Boston, alpha=0.5, nfolds=5)
+    expect_false(all(coef(Bos_cv0, s="lambda.min") == coef(Bos_cv4, s="lambda.min")))
+})
+
+
 test_that("prediction with NA works", {
     BostonNA <- Boston
     BostonNA[1, ] <- NA
