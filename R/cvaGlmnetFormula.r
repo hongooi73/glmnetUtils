@@ -33,7 +33,8 @@ UseMethod("cva.glmnet")
 #' @importFrom parallel parLapply
 #' @importFrom glmnet cv.glmnet
 #' @export
-cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, foldid=sample(nfolds, nrow(x), replace=TRUE),
+cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10,
+                               foldid=sample(rep(seq_len(nfolds), length=nrow(x))),
                                ..., outerParallel=NULL, checkInnerParallel=TRUE)
 {
     cl <- match.call()
@@ -52,7 +53,6 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10, foldi
         }
     }
 
-    #foldid <- sample(nfolds, nrow(x), replace=TRUE)
     if(length(foldid) != nrow(x) || !is.numeric(foldid))
         stop("invalid foldid specified")
     dotargs <- list(...)
