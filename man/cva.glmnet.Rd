@@ -16,8 +16,8 @@
 cva.glmnet(x, ...)
 
 \method{cva.glmnet}{default}(x, y, alpha = seq(0, 1, len = 11)^3,
-  nfolds = 10, foldid = sample(nfolds, nrow(x), replace = TRUE), ...,
-  outerParallel = NULL, checkInnerParallel = TRUE)
+  nfolds = 10, foldid = sample(rep(seq_len(nfolds), length = nrow(x))),
+  ..., outerParallel = NULL, checkInnerParallel = TRUE)
 
 \method{cva.glmnet}{formula}(formula, data, ..., weights = NULL,
   offset = NULL, subset = NULL, na.action = getOption("na.action"),
@@ -31,8 +31,8 @@ cva.glmnet(x, ...)
   which = match(TRUE, abs(object$alpha - alpha) < 1e-08),
   na.action = na.pass, ...)
 
-\method{coef}{cva.glmnet}(object, alpha, which = match(TRUE, abs(object$alpha
-  - alpha) < 1e-08), ...)
+\method{coef}{cva.glmnet}(object, alpha, which = match(TRUE,
+  abs(object$alpha - alpha) < 1e-08), ...)
 
 \method{print}{cva.glmnet.formula}(x, ...)
 
@@ -77,7 +77,7 @@ minlossplot(x, ...)
 
 \item{sparse}{Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels.}
 
-\item{use.model.frame}{Should the base \link[=model.frame]{model.frame} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
+\item{use.model.frame}{Should the base \link{model.frame} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
 
 \item{object}{For the \code{predict} and \code{coef} methods, an object returned by \code{cva.glmnet}.}
 
@@ -97,13 +97,13 @@ The \code{cva.glmnet} function does simultaneous cross-validation for both the a
 
 Optionally this loop over alpha can be parallelised; currently, \code{cva.glmnet} knows about two methods of doing so:
 \itemize{
-\item Via \link[=parLapply]{parLapply} in the parallel package. To use this, set \code{outerParallel} to a valid cluster object created by \link[=makeCluster]{makeCluster}.
+\item Via \link{parLapply} in the parallel package. To use this, set \code{outerParallel} to a valid cluster object created by \link{makeCluster}.
 \item Via \code{rxExec} as supplied by Microsoft R Server's RevoScaleR package. To use this, set \code{outerParallel} to a valid compute context created by \code{RxComputeContext}, or a character string specifying such a context.
 }
 
 If the outer loop is run in parallel, \code{cva.glmnet} can check if the inner loop (over lambda) is also set to run in parallel, and disable this if it would lead to contention for cores. This is done if it is likely that the parallelisation is local on a multicore machine, ie if \code{outerParallel} is a \code{SOCKcluster} object running on \code{"localhost"}, or if the RevoScaleR compute context is local parallel.
 
-There are two ways in which the matrix of predictors can be generated. The default, with \code{use.model.frame = FALSE}, is to process the additive terms in the formula independently. With wide datasets, this is much faster and more memory-efficient than the standard R approach which uses the \code{model.frame} and \code{model.matrix} functions. However, the resulting model object is not exactly the same as if the standard approach had been used; in particular, it lacks a bona fide \link[=terms]{terms} object. If you require interoperability with other packages that assume the standard model object structure, set \code{use.model.frame = TRUE}. See \link[=glmnet.model.matrix]{discussion} for more information on this topic.
+There are two ways in which the matrix of predictors can be generated. The default, with \code{use.model.frame = FALSE}, is to process the additive terms in the formula independently. With wide datasets, this is much faster and more memory-efficient than the standard R approach which uses the \code{model.frame} and \code{model.matrix} functions. However, the resulting model object is not exactly the same as if the standard approach had been used; in particular, it lacks a bona fide \link{terms} object. If you require interoperability with other packages that assume the standard model object structure, set \code{use.model.frame = TRUE}. See \link[=glmnet.model.matrix]{discussion} for more information on this topic.
 
 The \code{predict} method computes predictions for a specific alpha value given a \code{cva.glmnet} object. It looks up the supplied alpha (possibly supplied indirectly via the \code{which} argument) in the object's stored \code{alpha} vector, and calls \code{glmnet:::predict.cv.glmnet} on the corresponding \code{cv.glmnet} fit. All the arguments to that function are (or should be) supported.
 
@@ -151,5 +151,5 @@ leuk.pred <- predict(leuk.cva, leuk, which=6)
 
 \link[glmnet:predict.cv.glmnet]{glmnet::predict.cv.glmnet}, \link[glmnet:coef.cv.glmnet]{glmnet::coef.cv.glmnet}
 
-\link[=cva.glmnet]{cva.glmnet}, \link[glmnet:cv.glmnet]{glmnet::cv.glmnet}, \link[=plot]{plot}
+\link{cva.glmnet}, \link[glmnet:cv.glmnet]{glmnet::cv.glmnet}, \link{plot}
 }

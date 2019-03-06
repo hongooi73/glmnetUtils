@@ -23,8 +23,8 @@ glmnet(x, ...)
 
 \method{coef}{glmnet.formula}(object, ...)
 
-\method{print}{glmnet.formula}(x, digits = max(3, getOption("digits") - 3),
-  print.deviance.ratios = FALSE, ...)
+\method{print}{glmnet.formula}(x, digits = max(3, getOption("digits") -
+  3), print.deviance.ratios = FALSE, ...)
 }
 \arguments{
 \item{x}{For the default method, a matrix of predictor variables.}
@@ -53,7 +53,7 @@ glmnet(x, ...)
 
 \item{sparse}{Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels.}
 
-\item{use.model.frame}{Should the base \link[=model.frame]{model.frame} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
+\item{use.model.frame}{Should the base \link{model.frame} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
 
 \item{object}{For the \code{predict} and \code{coef} methods, an object of class \code{glmnet.formula}.}
 
@@ -69,7 +69,7 @@ Formula interface for elastic net modelling with glmnet
 \details{
 The \code{glmnet} function in this package is an S3 generic with a formula and a default method. The former calls the latter, and the latter is simply a direct call to the \code{glmnet} function in package glmnet. All the arguments to \code{glmnet::glmnet} are (or should be) supported.
 
-There are two ways in which the matrix of predictors can be generated. The default, with \code{use.model.frame = FALSE}, is to process the additive terms in the formula independently. With wide datasets, this is much faster and more memory-efficient than the standard R approach which uses the \code{model.frame} and \code{model.matrix} functions. However, the resulting model object is not exactly the same as if the standard approach had been used; in particular, it lacks a bona fide \link[=terms]{terms} object. If you require interoperability with other packages that assume the standard model object structure, set \code{use.model.frame = TRUE}. See \link[=glmnet.model.matrix]{discussion} for more information on this topic.
+There are two ways in which the matrix of predictors can be generated. The default, with \code{use.model.frame = FALSE}, is to process the additive terms in the formula independently. With wide datasets, this is much faster and more memory-efficient than the standard R approach which uses the \code{model.frame} and \code{model.matrix} functions. However, the resulting model object is not exactly the same as if the standard approach had been used; in particular, it lacks a bona fide \link{terms} object. If you require interoperability with other packages that assume the standard model object structure, set \code{use.model.frame = TRUE}. See \link[=glmnet.model.matrix]{discussion} for more information on this topic.
 
 The \code{predict} and \code{coef} methods are wrappers for the corresponding methods in the glmnet package. The former constructs a predictor model matrix from its \code{newdata} argument and passes that as the \code{newx} argument to \code{glmnet:::predict.glmnet}.
 }
@@ -94,5 +94,5 @@ glmnet(y ~ ., leuk, family="binomial")
 }
 }
 \seealso{
-\link[glmnet:glmnet]{glmnet::glmnet}, \link[glmnet:predict.glmnet]{glmnet::predict.glmnet}, \link[glmnet:coef.glmnet]{glmnet::coef.glmnet}, \link[=model.frame]{model.frame}, \link[=model.matrix]{model.matrix}
+\link[glmnet:glmnet]{glmnet::glmnet}, \link[glmnet:predict.glmnet]{glmnet::predict.glmnet}, \link[glmnet:coef.glmnet]{glmnet::coef.glmnet}, \link{model.frame}, \link{model.matrix}
 }

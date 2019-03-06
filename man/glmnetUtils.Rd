@@ -4,7 +4,6 @@
 \name{glmnetUtils}
 \alias{glmnetUtils}
 \alias{glmnetUtils-package}
-\alias{glmnetUtils-package}
 \title{Utilities for glmnet}
 \description{
 Some quality-of-life functions to streamline the process of fitting elastic net models with the \code{glmnet} package, specifically:
