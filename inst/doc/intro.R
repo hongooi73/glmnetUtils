@@ -68,13 +68,13 @@ summary(as.numeric(predict(mtcarsMod, mtcars) -
 leukFile <- file.path(tempdir(), "Leukemia.rdata")
 if(!file.exists(leukFile))
 {
-    download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData", leukFile, mode = "wb")
+    download.file("https://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData", leukFile, mode = "wb")
 }
 load(leukFile)
 
 ## ------------------------------------------------------------------------
 # Leukemia dataset from Trevor Hastie's website:
-# http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData
+# https://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData
 leuk <- do.call(data.frame, Leukemia)
 
 leukMod <- cva.glmnet(y ~ ., data=leuk, family="binomial")

@@ -1,3 +1,5 @@
+^Meta$
+^doc$
 ^.*\.rxproj$
 ^.*\.sln$
 ^.*\.rproj$
