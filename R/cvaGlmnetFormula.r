@@ -108,11 +108,11 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10,
 #'
 #' @section Value:
 #' For `cva.glmnet.default`, an object of class `cva.glmnet`. This is a list containing the following:
-#' 
+#'
 #' * `alpha` The vector of alpha values
 #' * `nfolds` The number of folds
 #' * `modlist` A list of `cv.glmnet` objects, containing the cross-validation results for each value of alpha
-#' 
+#'
 #' The function `cva.glmnet.formula` adds a few more components to the above, to facilitate working with formulas.
 #'
 #' @examples
@@ -133,7 +133,7 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10,
 #' @method cva.glmnet formula
 #' @export
 cva.glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset=NULL,
-                                   na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL, 
+                                   na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL,
                                    sparse=FALSE, use.model.frame=FALSE)
 {
     # must use NSE to get model.frame emulation to work
