@@ -242,6 +242,7 @@ print.cva.glmnet.formula <- function(x, ...)
 }
 
 
+#' @param legend.x,legend.y Location for the legend. Defaults to the top-left corner of the plot.
 #' @details
 #' The plot method for `cva.glmnet` objects plots the average cross-validated loss by lambda, for each value of alpha. Each line represents one `cv.glmnet` fit, corresponding to one value of alpha. Note that the specific lambda values can vary substantially by alpha.
 #'

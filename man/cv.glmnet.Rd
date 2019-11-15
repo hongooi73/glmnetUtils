@@ -81,7 +81,7 @@ cv.glmnet(Species ~ ., data=iris, family="multinomial")
 \dontrun{
 
 # Leukemia example dataset from Trevor Hastie's website
-download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
+download.file("https://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
               "Leukemia.RData")
 load("Leukemia.Rdata")
 leuk <- do.call(data.frame, Leukemia)

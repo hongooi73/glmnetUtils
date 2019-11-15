@@ -36,7 +36,8 @@ cva.glmnet(x, ...)
 
 \method{print}{cva.glmnet.formula}(x, ...)
 
-\method{plot}{cva.glmnet}(x, ...)
+\method{plot}{cva.glmnet}(x, ..., legend.x = xlim[1],
+  legend.y = xlim[2])
 
 minlossplot(x, ...)
 
@@ -86,6 +87,8 @@ minlossplot(x, ...)
 \item{which}{An alternative way of specifying alpha; the index number of the desired value within the alpha vector. If both \code{which} and \code{alpha} are supplied, the former takes precedence.}
 
 \item{newdata}{For the \code{predict} and \code{coef} methods, a data frame containing the observations for which to calculate predictions.}
+
+\item{legend.x, legend.y}{Location for the legend. Defaults to the top-left corner of the plot.}
 
 \item{cv.type}{For \code{minlossplot}, which cross-validated loss value to plot for each value of alpha. This can be either \code{"min"} which is the minimum loss, or \code{"1se"} which is the highest loss within 1 standard error of the minimum. The default is \code{"1se"}.}
 }
@@ -138,7 +141,7 @@ predict(cva, mtcars, alpha=1)
 \dontrun{
 
 # Leukemia example dataset from Trevor Hastie's website
-download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
+download.file("https://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
               "Leukemia.RData")
 load("Leukemia.Rdata")
 leuk <- do.call(data.frame, Leukemia)
