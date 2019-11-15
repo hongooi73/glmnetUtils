@@ -49,7 +49,7 @@ cv.glmnet.default <- function(x, y, ...)
 #'
 #' @seealso
 #' [glmnet::cv.glmnet], [glmnet::predict.cv.glmnet], [glmnet::coef.cv.glmnet], [model.frame], [model.matrix]
-#' 
+#'
 #' @examples
 #' cv.glmnet(mpg ~ ., data=mtcars)
 #'

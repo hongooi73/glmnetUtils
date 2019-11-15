@@ -48,7 +48,7 @@ glmnet.default <- function(x, y, ...)
 #'
 #' @seealso
 #' [glmnet::glmnet], [glmnet::predict.glmnet], [glmnet::coef.glmnet], [model.frame], [model.matrix]
-#' 
+#'
 #' @examples
 #' glmnet(mpg ~ ., data=mtcars)
 #'
