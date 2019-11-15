@@ -58,7 +58,7 @@ cv.glmnet.default <- function(x, y, ...)
 #' \dontrun{
 #'
 #' # Leukemia example dataset from Trevor Hastie's website
-#' download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
+#' download.file("https://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
 #'               "Leukemia.RData")
 #' load("Leukemia.Rdata")
 #' leuk <- do.call(data.frame, Leukemia)

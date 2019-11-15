@@ -122,7 +122,7 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10,
 #' \dontrun{
 #'
 #' # Leukemia example dataset from Trevor Hastie's website
-#' download.file("http://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
+#' download.file("https://web.stanford.edu/~hastie/glmnet/glmnetData/Leukemia.RData",
 #'               "Leukemia.RData")
 #' load("Leukemia.Rdata")
 #' leuk <- do.call(data.frame, Leukemia)
@@ -250,7 +250,7 @@ print.cva.glmnet.formula <- function(x, ...)
 #' @method plot cva.glmnet
 #' @rdname cva.glmnet
 #' @export
-plot.cva.glmnet <- function(x, ...)
+plot.cva.glmnet <- function(x, ..., legend.x=xlim[1], legend.y=xlim[2])
 {
     n <- length(x$modlist)
     cvm <- sapply(x$modlist, "[[", "cvm", simplify=FALSE)
