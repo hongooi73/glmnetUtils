@@ -263,6 +263,7 @@ plot.cva.glmnet <- function(x, ..., legend.x=xlim[1], legend.y=xlim[2])
     ylim <- range(ylst)
     plot(NA, xlim=xlim, ylim=ylim, xlab="log Lambda", ylab=x$modlist[[1]]$name, type="n", ...)
     for(i in seq_along(cvm)) lines(log(xlst[[i]]), ylst[[i]], col=i)
+    graphics::legend(xlim[1], ylim[2], x$alpha, col=seq_along(x$alpha), lty=1)
     invisible(x)
 }
 
