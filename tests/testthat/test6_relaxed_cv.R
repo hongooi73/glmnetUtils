@@ -4,13 +4,15 @@ data(Boston, package="MASS")
 x <- as.matrix(Boston[-1])
 y <- Boston$crim
 set.seed(12345)
-Bos_cv00 <- glmnet::cv.glmnet(x, y, weights=Boston$medv, offset=Boston$rad, alpha=0.5, relax=TRUE)
+Bos_cv00 <- glmnet::cv.glmnet(x, y, weights=Boston$medv, offset=Boston$rad, alpha=0.5, gamma=(0:3)/3, relax=TRUE)
 set.seed(12345)
-Bos_cv0 <- cv.glmnet(x, y, weights=Boston$medv, offset=Boston$rad, alpha=0.5, relax=TRUE)
+Bos_cv0 <- cv.glmnet(x, y, weights=Boston$medv, offset=Boston$rad, alpha=0.5, gamma=(0:3)/3, relax=TRUE)
 set.seed(12345)
-Bos_cv1 <- cv.glmnet(crim ~ ., data=Boston, weights=medv, offset=rad, alpha=0.5, use.model.frame=TRUE, relax=TRUE)
+Bos_cv1 <- cv.glmnet(crim ~ ., data=Boston, weights=medv, offset=rad, alpha=0.5, use.model.frame=TRUE,
+                     gamma=(0:3)/3, relax=TRUE)
 set.seed(12345)
-Bos_cv2 <- cv.glmnet(crim ~ ., data=Boston, weights=medv, offset=rad, alpha=0.5, use.model.frame=FALSE, relax=TRUE)
+Bos_cv2 <- cv.glmnet(crim ~ ., data=Boston, weights=medv, offset=rad, alpha=0.5, use.model.frame=FALSE,
+                     gamma=(0:3)/3, relax=TRUE)
 
 
 test_that("relaxed cv.glmnet works", {
