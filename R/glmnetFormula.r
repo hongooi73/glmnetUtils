@@ -81,7 +81,7 @@ glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NUL
 
     model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
     model$call <- match.call()
-    model$call[[1]] <- quote(glmnetUtils:::glmnet.formula)  # needed to make relaxed fitting work
+    model$call[[1]] <- eval(parse(text="glmnetUtils:::glmnet.formula"))  # needed to make relaxed fitting work
     model$terms <- xy$terms
     model$xlev <- xy$xlev
     model$alpha <- alpha
