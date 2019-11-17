@@ -1,5 +1,7 @@
 # glmnetUtils
 
+[![Build Status](https://dev.azure.com/hongooi/glmnetUtils/_apis/build/status/Hong-Revo.glmnetUtils?branchName=master)](https://dev.azure.com/hongooi/glmnetUtils/_build/latest?definitionId=1&branchName=master)
+
 Some quality-of-life functions to streamline the process of fitting elastic net models with `glmnet`, specifically:
 
 * `glmnet.formula` provides a formula/data frame interface to `glmnet`.

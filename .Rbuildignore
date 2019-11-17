@@ -6,3 +6,4 @@
 ^.*\.tss$
 ^.vs$
 ^misc$
+azure-pipelines.yml
