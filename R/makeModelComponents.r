@@ -87,7 +87,7 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
 
     if(!is.function(na.action))
         na.action <- get(na.action, mode="function")
-    if(!is.null(offset))
+    if(!is.null(offsetVals))
     {
         # explicitly call cbind.data.frame to deal with tibbles
         data <- na.action(cbind.data.frame(data[c(lhsVars, rhsVars)], offsetVals, weightVals))

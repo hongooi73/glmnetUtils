@@ -15,6 +15,20 @@ test_that("relaxed glmnet works", {
 })
 
 
+test_that("relaxed glmnet works with weights and offset", {
+    x <- as.matrix(mtcars[-1])
+    y <- mtcars$mpg
+    mod00 <- glmnet::glmnet(x, y, weights=mtcars$wt, offset=mtcars$am, alpha=0.5, relax=TRUE)
+    mod0 <- glmnet(x, y, weights=mtcars$wt, offset=mtcars$am, alpha=0.5, relax=TRUE)
+    mod1 <- glmnet(mpg ~ ., data=mtcars, weights=wt, offset=am, alpha=0.5, relax=TRUE)
+    expect_equivalent(mod00$beta, mod0$beta)
+    expect_equivalent(mod0$beta, mod1$beta)
+
+    expect_equivalent(mod00$relaxed$beta, mod0$relaxed$beta)
+    expect_equivalent(mod0$relaxed$beta, mod1$relaxed$beta)
+})
+
+
 test_that("relaxed predict and coef work", {
     x <- as.matrix(iris[-5])
     y <- iris$Species

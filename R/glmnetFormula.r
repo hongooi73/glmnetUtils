@@ -81,7 +81,7 @@ glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NUL
 
     model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
     model$call <- match.call()
-    model$call[[1]] <- quote(glmnetUtils::glmnet)  # needed to make relaxed fitting work
+    model$call[[1]] <- quote(glmnetUtils:::glmnet.formula)  # needed to make relaxed fitting work
     model$terms <- xy$terms
     model$xlev <- xy$xlev
     model$alpha <- alpha
@@ -89,11 +89,13 @@ glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NUL
     model$use.model.frame <- use.model.frame
     model$na.action <- na.action
 
+    # can't pass relax directly to glmnet because of NSE wackiness induced by update()
     if(relax)
     {
         if(utils::packageVersion("glmnet") < package_version("3.0.0"))
             stop("Relaxed fit requires glmnet version 3.0 or higher", call.=FALSE)
-        model <- glmnet::relax.glmnet(model, xy$x, formula=model$call$formula, alpha=alpha, ...)
+        model <- glmnet::relax.glmnet(model, xy$x, weights=xy$weights, offset=xy$offset, alpha=alpha,
+                                      ..., check.args=FALSE)
         class(model) <- c("relaxed.formula", class(model))
     }
     else class(model) <- c("glmnet.formula", class(model))
