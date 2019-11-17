@@ -133,8 +133,8 @@ cva.glmnet.default <- function(x, y, alpha=seq(0, 1, len=11)^3, nfolds=10,
 #' @method cva.glmnet formula
 #' @export
 cva.glmnet.formula <- function(formula, data, ..., weights=NULL, offset=NULL, subset=NULL,
-                                   na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL,
-                                   sparse=FALSE, use.model.frame=FALSE)
+                               na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL,
+                               sparse=FALSE, use.model.frame=FALSE)
 {
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)

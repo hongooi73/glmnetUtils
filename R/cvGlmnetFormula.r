@@ -35,6 +35,8 @@ cv.glmnet.default <- function(x, y, ...)
 #' @param nfolds The number of crossvalidation folds to use. See [glmnet::cv.glmnet] for more details.
 #' @param sparse Should the model matrix be in sparse format? This can save memory when dealing with many factor variables, each with many levels.
 #' @param use.model.frame Should the base [model.frame] function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid `model.frame` and construct the model matrix term-by-term; see [discussion][glmnet.model.matrix].
+#' @param gamma For `cv.glmnet.formula`, the values of the parameter for mixing the relaxed (non-regularised) fit with the regularized fit. Not used if `relax=FALSE`. Requires glmnet 3.0 or later.
+#' @param relax For `cv.glmnet.formula`, whether to perform a relaxed fit after the regularised one. Requires glmnet 3.0 or later.
 #' @param ... For `cv.glmnet.formula` and `cv.glmnet.default`, other arguments to be passed to [glmnet::cv.glmnet]; for the `predict` and `coef` methods, arguments to be passed to their counterparts in package glmnet.
 #'
 #' @details
@@ -45,7 +47,7 @@ cv.glmnet.default <- function(x, y, ...)
 #' The `predict` and `coef` methods are wrappers for the corresponding methods in the glmnet package. The former constructs a predictor model matrix from its `newdata` argument and passes that as the `newx` argument to `glmnet:::predict.cv.glmnet`.
 #'
 #' @return
-#' For `cv.glmnet.formula`, an object of class `cv.glmnet.formula`. This is basically the same object created by `glmnet::cv.glmnet`, but with extra components to allow formula usage.
+#' For `cv.glmnet.formula`, an object of class either `cv.glmnet.formula` or `cv.relaxed.formula`, based on the value of the `relax` argument. This is basically the same object created by `glmnet::cv.glmnet`, but with extra components to allow formula usage.
 #'
 #' @seealso
 #' [glmnet::cv.glmnet], [glmnet::predict.cv.glmnet], [glmnet::coef.cv.glmnet], [model.frame], [model.matrix]
@@ -70,7 +72,7 @@ cv.glmnet.default <- function(x, y, ...)
 #' @export
 cv.glmnet.formula <- function(formula, data, alpha=1, nfolds=10, ..., weights=NULL, offset=NULL, subset=NULL,
                               na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL,
-                              sparse=FALSE, use.model.frame=FALSE)
+                              sparse=FALSE, use.model.frame=FALSE, gamma=c(0, 0.25, 0.5, 0.75, 1), relax=FALSE)
 {
     # must use NSE to get model.frame emulation to work
     cl <- match.call(expand.dots=FALSE)
@@ -79,8 +81,11 @@ cv.glmnet.formula <- function(formula, data, alpha=1, nfolds=10, ..., weights=NU
     else makeModelComponents
     xy <- eval.parent(cl)
 
+    if(relax && utils::packageVersion("glmnet") < package_version("3.0.0"))
+        stop("Relaxed fit requires glmnet version 3.0 or higher", call.=FALSE)
+
     model <- glmnet::cv.glmnet(xy$x, xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha,
-                               nfolds=nfolds, ...)
+                               nfolds=nfolds, ..., relax=relax)
     model$call <- match.call()
     model$terms <- xy$terms
     model$xlev <- xy$xlev
@@ -89,7 +94,9 @@ cv.glmnet.formula <- function(formula, data, alpha=1, nfolds=10, ..., weights=NU
     model$sparse <- sparse
     model$use.model.frame <- use.model.frame
     model$na.action <- na.action
-    class(model) <- c("cv.glmnet.formula", class(model))
+    class(model) <- if(relax)
+        c("cv.relaxed.formula", class(model))
+    else c("cv.glmnet.formula", class(model))
     model
 }
 
@@ -153,3 +160,40 @@ print.cv.glmnet.formula <- function(x, ...)
 }
 
 
+#' @rdname cv.glmnet
+#' @method predict cv.relaxed.formula
+#' @export
+predict.cv.relaxed.formula <- function(object, newdata, na.action=na.pass, ...)
+{
+    if(!inherits(object, "cv.relaxed.formula"))
+        stop("invalid cv.relaxed.formula object")
+
+    # must use NSE to get model.frame emulation to work
+    cl <- match.call(expand.dots=FALSE)
+    cl$formula <- delete.response(object$terms)
+    cl$data <- cl$newdata
+    cl$newdata <- NULL
+    cl$xlev <- object$xlev
+    cl[[1]] <- if(object$use.model.frame)
+        makeModelComponentsMF
+    else makeModelComponents
+
+    xy <- eval.parent(cl)
+    x <- xy$x
+    offset <- xy$offset
+
+    class(object) <- class(object)[-1]
+    predict(object, x, ...)
+}
+
+
+#' @rdname cv.glmnet
+#' @method coef cv.glmnet.formula
+#' @export
+coef.cv.relaxed.formula <- function(object, ...)
+{
+    if(!inherits(object, "cv.relaxed.formula"))
+        stop("invalid cv.relaxed.formula object")
+    class(object) <- class(object)[-1]
+    coef(object, ...)
+}

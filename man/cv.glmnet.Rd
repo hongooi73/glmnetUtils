@@ -7,6 +7,8 @@
 \alias{predict.cv.glmnet.formula}
 \alias{coef.cv.glmnet.formula}
 \alias{print.cv.glmnet.formula}
+\alias{predict.cv.relaxed.formula}
+\alias{coef.cv.relaxed.formula}
 \title{Formula interface for elastic net cross-validation with cv.glmnet}
 \usage{
 cv.glmnet(x, ...)
@@ -16,7 +18,8 @@ cv.glmnet(x, ...)
 \method{cv.glmnet}{formula}(formula, data, alpha = 1, nfolds = 10, ...,
   weights = NULL, offset = NULL, subset = NULL,
   na.action = getOption("na.action"), drop.unused.levels = FALSE,
-  xlev = NULL, sparse = FALSE, use.model.frame = FALSE)
+  xlev = NULL, sparse = FALSE, use.model.frame = FALSE,
+  gamma = c(0, 0.25, 0.5, 0.75, 1), relax = FALSE)
 
 \method{predict}{cv.glmnet.formula}(object, newdata, na.action = na.pass,
   ...)
@@ -24,6 +27,11 @@ cv.glmnet(x, ...)
 \method{coef}{cv.glmnet.formula}(object, ...)
 
 \method{print}{cv.glmnet.formula}(x, ...)
+
+\method{predict}{cv.relaxed.formula}(object, newdata,
+  na.action = na.pass, ...)
+
+\method{coef}{cv.glmnet.formula}(object, ...)
 }
 \arguments{
 \item{x}{For the default method, a matrix of predictor variables.}
@@ -56,12 +64,16 @@ cv.glmnet(x, ...)
 
 \item{use.model.frame}{Should the base \link{model.frame} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
 
+\item{gamma}{For \code{cv.glmnet.formula}, the values of the parameter for mixing the relaxed (non-regularised) fit with the regularized fit. Not used if \code{relax=FALSE}. Requires glmnet 3.0 or later.}
+
+\item{relax}{For \code{cv.glmnet.formula}, whether to perform a relaxed fit after the regularised one. Requires glmnet 3.0 or later.}
+
 \item{object}{For the \code{predict} and \code{coef} methods, an object of class \code{cv.glmnet.formula}.}
 
 \item{newdata}{For the \code{predict} method, a data frame containing the observations for which to calculate predictions.}
 }
 \value{
-For \code{cv.glmnet.formula}, an object of class \code{cv.glmnet.formula}. This is basically the same object created by \code{glmnet::cv.glmnet}, but with extra components to allow formula usage.
+For \code{cv.glmnet.formula}, an object of class either \code{cv.glmnet.formula} or \code{cv.relaxed.formula}, based on the value of the \code{relax} argument. This is basically the same object created by \code{glmnet::cv.glmnet}, but with extra components to allow formula usage.
 }
 \description{
 Formula interface for elastic net cross-validation with cv.glmnet
