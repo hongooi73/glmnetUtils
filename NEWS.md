@@ -1,5 +1,6 @@
 ## glmnetUtils 1.1.3
 
+- Support relaxed (non-regularised) fits in `glmnet.formula` (requires glmnet 3.0 or later).
 - Add a legend when plotting a `cva.glmnet` object.
 
 ## glmnetUtils 1.1.2

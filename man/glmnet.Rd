@@ -7,6 +7,9 @@
 \alias{predict.glmnet.formula}
 \alias{coef.glmnet.formula}
 \alias{print.glmnet.formula}
+\alias{print.relaxed.formula}
+\alias{predict.relaxed.formula}
+\alias{coef.relaxed.formula}
 \title{Formula interface for elastic net modelling with glmnet}
 \usage{
 glmnet(x, ...)
@@ -16,7 +19,7 @@ glmnet(x, ...)
 \method{glmnet}{formula}(formula, data, alpha = 1, ..., weights = NULL,
   offset = NULL, subset = NULL, na.action = getOption("na.action"),
   drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
-  use.model.frame = FALSE)
+  use.model.frame = FALSE, relax = FALSE)
 
 \method{predict}{glmnet.formula}(object, newdata, offset = NULL,
   na.action = na.pass, ...)
@@ -25,6 +28,14 @@ glmnet(x, ...)
 
 \method{print}{glmnet.formula}(x, digits = max(3, getOption("digits") -
   3), print.deviance.ratios = FALSE, ...)
+
+\method{print}{relaxed.formula}(x, digits = max(3, getOption("digits") -
+  3), print.deviance.ratios = FALSE, ...)
+
+\method{predict}{relaxed.formula}(object, newdata, offset = NULL,
+  na.action = na.pass, ...)
+
+\method{coef}{relaxed.formula}(object, ...)
 }
 \arguments{
 \item{x}{For the default method, a matrix of predictor variables.}
@@ -55,6 +66,8 @@ glmnet(x, ...)
 
 \item{use.model.frame}{Should the base \link{model.frame} function be used when constructing the model matrix? This is the standard method that most R modelling functions use, but has some disadvantages. The default is to avoid \code{model.frame} and construct the model matrix term-by-term; see \link[=glmnet.model.matrix]{discussion}.}
 
+\item{relax}{For \code{glmnet.formula}, whether to perform a relaxed (non-regularised) fit after the regularised one. Requires glmnet 3.0 or later.}
+
 \item{object}{For the \code{predict} and \code{coef} methods, an object of class \code{glmnet.formula}.}
 
 \item{newdata}{For the \code{predict} method, a data frame containing the observations for which to calculate predictions.}
@@ -75,7 +88,7 @@ The \code{predict} and \code{coef} methods are wrappers for the corresponding me
 }
 \section{Value}{
 
-For \code{glmnet.formula}, an object of class \code{glmnet.formula}. This is basically the same object created by \code{glmnet::glmnet}, but with extra components to allow formula usage.
+For \code{glmnet.formula}, an object of class either \code{glmnet.formula} or \code{relaxed.formula}, based on the value of the \code{relax} argument. This is basically the same object created by \code{glmnet::glmnet}, but with extra components to allow formula usage.
 }
 
 \examples{
