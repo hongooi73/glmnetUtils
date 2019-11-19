@@ -1,3 +1,7 @@
+## glmnetUtils 1.1.4
+
+- Fix printout of `glmnet.formula` object.
+
 ## glmnetUtils 1.1.3
 
 - Support relaxed (non-regularised) fits in `glmnet.formula` and `cv.glmnet.formula` (requires glmnet 3.0 or later).
