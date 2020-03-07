@@ -124,7 +124,11 @@ makeModelComponents <- function(formula, data, weights=NULL, offset=NULL, subset
             else model.matrix(terms(mf), mf, xlev=xlev)
 
             # store levels of x
-            attr(out, "xlev") <- lapply(mf, levels)
+            # make sure to handle non-factor categorical x properly
+            attr(out, "xlev") <- lapply(mf, function(x)
+            {
+                if(is.factor(x)) levels(x) else if(is.character(x)) sort(unique(x)) else NULL
+            })
         }
         else if(length(xvars) == 1)
         {
