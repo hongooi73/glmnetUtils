@@ -15,29 +15,58 @@
 \usage{
 cva.glmnet(x, ...)
 
-\method{cva.glmnet}{default}(x, y, alpha = seq(0, 1, len = 11)^3,
-  nfolds = 10, foldid = sample(rep(seq_len(nfolds), length = nrow(x))),
-  ..., outerParallel = NULL, checkInnerParallel = TRUE)
+\method{cva.glmnet}{default}(
+  x,
+  y,
+  alpha = seq(0, 1, len = 11)^3,
+  nfolds = 10,
+  foldid = sample(rep(seq_len(nfolds), length = nrow(x))),
+  ...,
+  outerParallel = NULL,
+  checkInnerParallel = TRUE
+)
 
-\method{cva.glmnet}{formula}(formula, data, ..., weights = NULL,
-  offset = NULL, subset = NULL, na.action = getOption("na.action"),
-  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
-  use.model.frame = FALSE)
+\method{cva.glmnet}{formula}(
+  formula,
+  data,
+  ...,
+  weights = NULL,
+  offset = NULL,
+  subset = NULL,
+  na.action = getOption("na.action"),
+  drop.unused.levels = FALSE,
+  xlev = NULL,
+  sparse = FALSE,
+  use.model.frame = FALSE
+)
 
-\method{predict}{cva.glmnet}(object, newx, alpha, which = match(TRUE,
-  abs(object$alpha - alpha) < 1e-08), ...)
-
-\method{predict}{cva.glmnet.formula}(object, newdata, alpha,
+\method{predict}{cva.glmnet}(
+  object,
+  newx,
+  alpha,
   which = match(TRUE, abs(object$alpha - alpha) < 1e-08),
-  na.action = na.pass, ...)
+  ...
+)
 
-\method{coef}{cva.glmnet}(object, alpha, which = match(TRUE,
-  abs(object$alpha - alpha) < 1e-08), ...)
+\method{predict}{cva.glmnet.formula}(
+  object,
+  newdata,
+  alpha,
+  which = match(TRUE, abs(object$alpha - alpha) < 1e-08),
+  na.action = na.pass,
+  ...
+)
+
+\method{coef}{cva.glmnet}(
+  object,
+  alpha,
+  which = match(TRUE, abs(object$alpha - alpha) < 1e-08),
+  ...
+)
 
 \method{print}{cva.glmnet.formula}(x, ...)
 
-\method{plot}{cva.glmnet}(x, ..., legend.x = xlim[1],
-  legend.y = xlim[2])
+\method{plot}{cva.glmnet}(x, ..., legend.x = xlim[1], legend.y = xlim[2])
 
 minlossplot(x, ...)
 
@@ -152,7 +181,7 @@ leuk.pred <- predict(leuk.cva, leuk, which=6)
 \seealso{
 \link[glmnet:cv.glmnet]{glmnet::cv.glmnet}
 
-\link[glmnet:predict.cv.glmnet]{glmnet::predict.cv.glmnet}, \link[glmnet:coef.cv.glmnet]{glmnet::coef.cv.glmnet}
+\link[glmnet:predict.cv.glmnet]{glmnet::predict.cv.glmnet}, \link[glmnet:predict.cv.glmnet]{glmnet::coef.cv.glmnet}
 
 \link{cva.glmnet}, \link[glmnet:cv.glmnet]{glmnet::cv.glmnet}, \link{plot}
 }

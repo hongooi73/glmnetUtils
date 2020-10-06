@@ -15,21 +15,31 @@ cv.glmnet(x, ...)
 
 \method{cv.glmnet}{default}(x, y, ...)
 
-\method{cv.glmnet}{formula}(formula, data, alpha = 1, nfolds = 10, ...,
-  weights = NULL, offset = NULL, subset = NULL,
-  na.action = getOption("na.action"), drop.unused.levels = FALSE,
-  xlev = NULL, sparse = FALSE, use.model.frame = FALSE,
-  gamma = c(0, 0.25, 0.5, 0.75, 1), relax = FALSE)
+\method{cv.glmnet}{formula}(
+  formula,
+  data,
+  alpha = 1,
+  nfolds = 10,
+  ...,
+  weights = NULL,
+  offset = NULL,
+  subset = NULL,
+  na.action = getOption("na.action"),
+  drop.unused.levels = FALSE,
+  xlev = NULL,
+  sparse = FALSE,
+  use.model.frame = FALSE,
+  gamma = c(0, 0.25, 0.5, 0.75, 1),
+  relax = FALSE
+)
 
-\method{predict}{cv.glmnet.formula}(object, newdata, na.action = na.pass,
-  ...)
+\method{predict}{cv.glmnet.formula}(object, newdata, na.action = na.pass, ...)
 
 \method{coef}{cv.glmnet.formula}(object, ...)
 
 \method{print}{cv.glmnet.formula}(x, ...)
 
-\method{predict}{cv.relaxed.formula}(object, newdata,
-  na.action = na.pass, ...)
+\method{predict}{cv.relaxed.formula}(object, newdata, na.action = na.pass, ...)
 
 \method{coef}{cv.glmnet.formula}(object, ...)
 }
@@ -101,5 +111,5 @@ cv.glmnet(y ~ ., leuk, family="binomial")
 }
 }
 \seealso{
-\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}, \link[glmnet:predict.cv.glmnet]{glmnet::predict.cv.glmnet}, \link[glmnet:coef.cv.glmnet]{glmnet::coef.cv.glmnet}, \link{model.frame}, \link{model.matrix}
+\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}, \link[glmnet:predict.cv.glmnet]{glmnet::predict.cv.glmnet}, \link[glmnet:predict.cv.glmnet]{glmnet::coef.cv.glmnet}, \link{model.frame}, \link{model.matrix}
 }

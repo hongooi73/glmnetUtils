@@ -16,24 +16,41 @@ glmnet(x, ...)
 
 \method{glmnet}{default}(x, y, ...)
 
-\method{glmnet}{formula}(formula, data, alpha = 1, ..., weights = NULL,
-  offset = NULL, subset = NULL, na.action = getOption("na.action"),
-  drop.unused.levels = FALSE, xlev = NULL, sparse = FALSE,
-  use.model.frame = FALSE, relax = FALSE)
+\method{glmnet}{formula}(
+  formula,
+  data,
+  alpha = 1,
+  ...,
+  weights = NULL,
+  offset = NULL,
+  subset = NULL,
+  na.action = getOption("na.action"),
+  drop.unused.levels = FALSE,
+  xlev = NULL,
+  sparse = FALSE,
+  use.model.frame = FALSE,
+  relax = FALSE
+)
 
-\method{predict}{glmnet.formula}(object, newdata, offset = NULL,
-  na.action = na.pass, ...)
+\method{predict}{glmnet.formula}(object, newdata, offset = NULL, na.action = na.pass, ...)
 
 \method{coef}{glmnet.formula}(object, ...)
 
-\method{print}{glmnet.formula}(x, digits = max(3, getOption("digits") -
-  3), print.deviance.ratios = FALSE, ...)
+\method{print}{glmnet.formula}(
+  x,
+  digits = max(3, getOption("digits") - 3),
+  print.deviance.ratios = FALSE,
+  ...
+)
 
-\method{print}{relaxed.formula}(x, digits = max(3, getOption("digits") -
-  3), print.deviance.ratios = FALSE, ...)
+\method{print}{relaxed.formula}(
+  x,
+  digits = max(3, getOption("digits") - 3),
+  print.deviance.ratios = FALSE,
+  ...
+)
 
-\method{predict}{relaxed.formula}(object, newdata, offset = NULL,
-  na.action = na.pass, ...)
+\method{predict}{relaxed.formula}(object, newdata, offset = NULL, na.action = na.pass, ...)
 
 \method{coef}{relaxed.formula}(object, ...)
 }
@@ -107,5 +124,5 @@ glmnet(y ~ ., leuk, family="binomial")
 }
 }
 \seealso{
-\link[glmnet:glmnet]{glmnet::glmnet}, \link[glmnet:predict.glmnet]{glmnet::predict.glmnet}, \link[glmnet:coef.glmnet]{glmnet::coef.glmnet}, \link{model.frame}, \link{model.matrix}
+\link[glmnet:glmnet]{glmnet::glmnet}, \link[glmnet:predict.glmnet]{glmnet::predict.glmnet}, \link[glmnet:predict.glmnet]{glmnet::coef.glmnet}, \link{model.frame}, \link{model.matrix}
 }
