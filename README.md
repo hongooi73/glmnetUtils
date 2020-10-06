@@ -1,6 +1,6 @@
 # glmnetUtils
 
-[![Build Status](https://dev.azure.com/hongooi/glmnetUtils/_apis/build/status/Hong-Revo.glmnetUtils?branchName=master)](https://dev.azure.com/hongooi/glmnetUtils/_build/latest?definitionId=1&branchName=master)
+![R-CMD-check](https://github.com/hongooi73/glmnetUtils/workflows/R-CMD-check/badge.svg)
 
 Some quality-of-life functions to streamline the process of fitting elastic net models with `glmnet`, specifically:
 
