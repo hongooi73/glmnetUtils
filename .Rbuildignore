@@ -7,3 +7,4 @@
 ^.vs$
 ^misc$
 azure-pipelines.yml
+^\.github$
