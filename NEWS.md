@@ -1,3 +1,7 @@
+## glmnetUtils 1.1.6
+
+- Update maintainer email address.
+
 ## glmnetUtils 1.1.5
 
 - Fix handling of non-factor categorical predictors (from R 4.0, data frames will not have character columns converted to factors by default). The practical impact of this should be minor.

@@ -1,6 +1,6 @@
 Package: glmnetUtils
 Type: Package
-Version: 1.1.5
+Version: 1.1.6
 Title: Utilities for 'Glmnet'
 Description: Provides a formula interface for the 'glmnet' package for
     elasticnet regression, a method for cross-validating the alpha parameter,
@@ -18,8 +18,10 @@ Suggests:
     MASS,
     doParallel,
     testthat
-Author: Microsoft [cph], Hong Ooi [aut, cre]
-Maintainer: Hong Ooi <hongooi@microsoft.com>
+Authors@R: c(
+        person("Microsoft", role="cph"),
+        person("Hong", "Ooi", email="hongooi73@gmail.com", role=c("aut", "cre"))
+    )
 NeedsCompilation: no
 VignetteBuilder: knitr
 Copyright: Microsoft
