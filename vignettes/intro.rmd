@@ -12,7 +12,7 @@ library(glmnetUtils)
 library(MASS)
 ```
 
-The [glmnetUtils package](https://github.com/hong-revo/glmnetUtils) provides a collection of tools to streamline the process of fitting elastic net models with [glmnet](https://cran.r-project.org/package=glmnet). I wrote the package after a couple of projects where I found myself writing the same boilerplate code to convert a data frame into a predictor matrix and a response vector. In addition to providing a formula interface, it also features a function `cva.glmnet` to do crossvalidation for both $\alpha$ and $\lambda$, as well as some utility functions.
+The [glmnetUtils package](https://github.com/hongooi73/glmnetUtils) provides a collection of tools to streamline the process of fitting elastic net models with [glmnet](https://cran.r-project.org/package=glmnet). I wrote the package after a couple of projects where I found myself writing the same boilerplate code to convert a data frame into a predictor matrix and a response vector. In addition to providing a formula interface, it also features a function `cva.glmnet` to do crossvalidation for both $\alpha$ and $\lambda$, as well as some utility functions.
 
 ## The formula interface
 
@@ -184,7 +184,7 @@ leukMod
 `cva.glmnet` uses the algorithm described in the help for `cv.glmnet`, which is to fix the distribution of observations across folds and then call `cv.glmnet` in a loop with different values of $\alpha$. Optionally, you can parallelise this outer loop, by setting the `outerParallel` argument to a non-NULL value. Currently, glmnetUtils supports the following methods of parallelisation:
 
 - Via `parLapply` in the parallel package. To use this, set `outerParallel` to a valid cluster object created by `makeCluster`. 
-- Via `rxExec` as supplied by [Microsoft R Server's](https://www.microsoft.com/en-au/cloud-platform/r-server) RevoScaleR package. To use this, set `outerParallel` to a valid compute context created by `RxComputeContext`, or a character string specifying such a context. 
+- Via `rxExec` as supplied by [Microsoft R Server's](https://www.microsoft.com/en-au/sql-server/machine-learning-server) RevoScaleR package. To use this, set `outerParallel` to a valid compute context created by `RxComputeContext`, or a character string specifying such a context. 
 
 If the outer loop is run in parallel, `cva.glmnet` can check if the inner loop (over $\lambda$) is also set to run in parallel, and disable this if it would lead to contention for cores.
 
@@ -204,5 +204,5 @@ plot(leukMod$modlist[[10]])  # alpha = 0.729
 
 ## Conclusion
 
-The glmnetUtils package is a way to improve quality of life for users of glmnet. As with many R packages, it's always under development; you can get the latest version from my [GitHub repo](https://github.com/Hong-Revo/glmnetUtils). If you find a bug, or if you want to suggest improvements to the package, please feel free to contact me at [hongooi@microsoft.com](mailto:hongooi@microsoft.com).
+The glmnetUtils package is a way to improve quality of life for users of glmnet. As with many R packages, it's always under development; you can get the latest version from my [GitHub repo](https://github.com/hongooi73/glmnetUtils). If you find a bug, or if you want to suggest improvements to the package, please feel free to contact me at [hongooi73@gmail.com](mailto:hongooi73@gmail.com).
 

@@ -14,5 +14,5 @@ You can install the development version from Github using `devtools::install_git
 
     install.packages("devtools")
     library(devtools)
-    install_github("hong-revo/glmnetUtils")
+    install_github("hongooi73/glmnetUtils")
     library(glmnetUtils)
