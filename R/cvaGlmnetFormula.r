@@ -242,7 +242,8 @@ print.cva.glmnet.formula <- function(x, ...)
 }
 
 
-#' @param legend.x,legend.y Location for the legend. Defaults to the top-left corner of the plot.
+#' @param log.x Whether to plot the X-axis (lambda) on the log scale. Defaults to TRUE, which for most lambda sequences produces a more reasonable looking plot. If your lambda sequence includes zero, set this to FALSE.
+#' @param legend.x,legend.y Location for the legend. Defaults to the top-left corner of the plot. Set either of these to NULL to omit the legend.
 #' @details
 #' The plot method for `cva.glmnet` objects plots the average cross-validated loss by lambda, for each value of alpha. Each line represents one `cv.glmnet` fit, corresponding to one value of alpha. Note that the specific lambda values can vary substantially by alpha.
 #'
@@ -251,7 +252,7 @@ print.cva.glmnet.formula <- function(x, ...)
 #' @method plot cva.glmnet
 #' @rdname cva.glmnet
 #' @export
-plot.cva.glmnet <- function(x, ..., legend.x=xlim[1], legend.y=xlim[2])
+plot.cva.glmnet <- function(x, ..., legend.x=xlim[1], legend.y=xlim[2], log.x=TRUE)
 {
     n <- length(x$modlist)
     cvm <- sapply(x$modlist, "[[", "cvm", simplify=FALSE)
@@ -260,11 +261,17 @@ plot.cva.glmnet <- function(x, ..., legend.x=xlim[1], legend.y=xlim[2])
     ylab <- x$modlist[[1]]$name
     xlst <- lapply(x$modlist, "[[", "lambda")
     ylst <- lapply(x$modlist, "[[", "cvm")
-    xlim <- log(range(xlst))
+    xlim <- if(log.x) log(range(xlst)) else range(xlst)
     ylim <- range(ylst)
-    plot(NA, xlim=xlim, ylim=ylim, xlab="log Lambda", ylab=x$modlist[[1]]$name, type="n", ...)
-    for(i in seq_along(cvm)) lines(log(xlst[[i]]), ylst[[i]], col=i)
-    graphics::legend(xlim[1], ylim[2], x$alpha, col=seq_along(x$alpha), lty=1)
+    xlab <- if(log.x) "log Lambda" else "Lambda"
+    plot(NA, xlim=xlim, ylim=ylim, xlab=xlab, ylab=x$modlist[[1]]$name, type="n", ...)
+    for(i in seq_along(cvm))
+    {
+        xvals <- if(log.x) log(xlst[[i]]) else xlst[[i]]
+        lines(xvals, ylst[[i]], col=i)
+    }
+    if(!is.null(legend.x) && !is.null(legend.y))
+        graphics::legend(xlim[1], ylim[2], x$alpha, col=seq_along(x$alpha), lty=1)
     invisible(x)
 }
 
