@@ -25,6 +25,7 @@ glmnet.default <- function(x, y, ...)
 #' @param y For the default method, a response vector or matrix (for a multinomial response).
 #' @param formula A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.
 #' @param data A data frame or matrix containing the variables in the formula.
+#' @param family The model family. See [glmnet::glmnet] for how to specify this argument.
 #' @param weights An optional vector of case weights to be used in the fitting process. If missing, defaults to an unweighted fit.
 #' @param offset An optional vector of offsets, an _a priori_ known component to be included in the linear predictor.
 #' @param subset An optional vector specifying the subset of observations to be used to fit the model.
@@ -68,7 +69,9 @@ glmnet.default <- function(x, y, ...)
 #' @method glmnet formula
 #' @importFrom glmnet glmnet
 #' @export
-glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NULL, subset=NULL,
+glmnet.formula <- function(formula, data,
+                           family=c("gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian"),
+                           alpha=1, ..., weights=NULL, offset=NULL, subset=NULL,
                            na.action=getOption("na.action"), drop.unused.levels=FALSE, xlev=NULL,
                            sparse=FALSE, use.model.frame=FALSE, relax=FALSE)
 {
@@ -79,7 +82,19 @@ glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NUL
     else makeModelComponents
     xy <- eval.parent(cl)
 
-    model <- glmnet::glmnet(x=xy$x, y=xy$y, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
+    if(is.character(family))
+        family <- match.arg(family)
+    else
+    {
+        if(utils::packageVersion("glmnet") < package_version("4.0.0"))
+            stop("Enhanced family argument requires glmnet version 4.0 or higher", call.=FALSE)
+        if(is.function(family))
+            family <- family()
+        else if(!inherits(family, "family"))
+            stop("Invalid family argument; must be either character, function or family object")
+    }
+
+    model <- glmnet::glmnet(xy$x, y=xy$y, family=family, weights=xy$weights, offset=xy$offset, alpha=alpha, ...)
     model$call <- match.call()
     model$call[[1]] <- parse(text="glmnetUtils:::glmnet.formula")[[1]]  # needed to make relaxed fitting work
     model$terms <- xy$terms
@@ -94,7 +109,7 @@ glmnet.formula <- function(formula, data, alpha=1, ..., weights=NULL, offset=NUL
     {
         if(utils::packageVersion("glmnet") < package_version("3.0.0"))
             stop("Relaxed fit requires glmnet version 3.0 or higher", call.=FALSE)
-        model <- glmnet::relax.glmnet(model, xy$x, weights=xy$weights, offset=xy$offset, alpha=alpha,
+        model <- glmnet::relax.glmnet(model, xy$x, family=family, weights=xy$weights, offset=xy$offset, alpha=alpha,
                                       ..., check.args=FALSE)
         class(model) <- c("relaxed.formula", class(model))
     }

@@ -28,7 +28,8 @@ NULL
 
 #' @importFrom Matrix sparse.model.matrix
 # short, simple function that unavoidably creates a pxp square matrix (!)
-makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subset=NULL, na.action=getOption("na.action"),
+makeModelComponentsMF <- function(formula, data, weights=NULL, offset=NULL, subset=NULL,
+                                  na.action=getOption("na.action"),
                                   drop.unused.levels=FALSE, xlev=NULL, sparse=FALSE, ...)
 {
     # more NSE hackery

@@ -19,6 +19,7 @@ glmnet(x, ...)
 \method{glmnet}{formula}(
   formula,
   data,
+  family = c("gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian"),
   alpha = 1,
   ...,
   weights = NULL,
@@ -64,6 +65,8 @@ glmnet(x, ...)
 \item{formula}{A model formula; interaction terms are allowed and will be expanded per the usual rules for linear models.}
 
 \item{data}{A data frame or matrix containing the variables in the formula.}
+
+\item{family}{The model family. See \link[glmnet:glmnet]{glmnet::glmnet} for how to specify this argument.}
 
 \item{alpha}{The elastic net mixing parameter. See \link[glmnet:glmnet]{glmnet::glmnet} for more details.}
 
