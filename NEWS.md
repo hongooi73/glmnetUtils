@@ -1,3 +1,7 @@
+## glmnetUtils 1.1.8
+
+- Skip some tests on 32-bit Solaris R-patched due to numerical convergence issues.
+
 ## glmnetUtils 1.1.7
 
 - Add some plotting options for `plot.cva.glmnet`: `log.x` controls whether to plot the X-axis (lambda) on the log scale, and the legend can be omitted by setting either `legend.x` or `legend.y` to `NULL`.

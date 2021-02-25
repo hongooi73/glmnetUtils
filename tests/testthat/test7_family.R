@@ -1,5 +1,8 @@
 context("Enhanced family arg")
 
+# to avoid issues with 32-bit Solaris checks on CRAN
+skip_on_os("solaris")
+
 
 test_that("enhanced family arg works with glmnet", {
     x <- as.matrix(mtcars[-1])
