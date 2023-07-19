@@ -27,6 +27,7 @@ test_that("enhanced family arg works with glmnet", {
 
 
 test_that("enhanced family arg works with cv.glmnet", {
+    skip_if_not_installed("MASS")
     data(Boston, package="MASS")
     x <- as.matrix(Boston[-1])
     y <- Boston$crim
@@ -57,6 +58,7 @@ test_that("enhanced family arg works with cv.glmnet", {
 
 
 test_that("enhanced family arg works with cva.glmnet", {
+    skip_if_not_installed("MASS")
     data(Boston, package="MASS")
 
     set.seed(12345)
@@ -94,6 +96,7 @@ test_that("enhanced family arg works with relaxed glmnet", {
 
 
 test_that("enhanced family arg works with relaxed cv.glmnet", {
+    skip_if_not_installed("MASS")
     data(Boston, package="MASS")
     x <- as.matrix(Boston[-1])
     y <- Boston$crim

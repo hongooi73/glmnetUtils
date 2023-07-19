@@ -1,5 +1,7 @@
 context("relaxed cv.glmnet")
 
+
+skip_if_not_installed("MASS")
 data(Boston, package="MASS")
 x <- as.matrix(Boston[-1])
 y <- Boston$crim
