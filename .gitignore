@@ -170,3 +170,5 @@ pip-log.txt
 *.mo
 #Mr Developer
 .mr.developer.cfg
+/doc/
+/Meta/

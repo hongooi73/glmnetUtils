@@ -1,3 +1,7 @@
+## glmnetUtils 1.1.9
+
+- Remove vignette dependency on an external download.
+
 ## glmnetUtils 1.1.8
 
 - Skip some tests on 32-bit Solaris R-patched due to numerical convergence issues.
