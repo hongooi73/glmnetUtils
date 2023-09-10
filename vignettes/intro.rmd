@@ -52,7 +52,7 @@ mtcarsX <- as.matrix(mtcars[c("cyl", "disp", "hp")])
 mtcarsY <- mtcars$mpg
 mtcarsMod2 <- glmnet(mtcarsX, mtcarsY)
 
-summary(as.numeric(predict(mtcarsMod, mtcars) - 
+summary(as.numeric(predict(mtcarsMod, mtcars) -
                    predict(mtcarsMod2, mtcarsX)))
 ```
 
@@ -98,13 +98,13 @@ df3 <- makeSampleData(N=1000, P=10000)
 
 library(microbenchmark)
 res <- microbenchmark(
-    glmnet(y ~ ., df1, use.model.frame=TRUE), 
-    glmnet(y ~ ., df1, use.model.frame=FALSE), 
-    glmnet(y ~ ., df2, use.model.frame=TRUE), 
-    glmnet(y ~ ., df2, use.model.frame=FALSE), 
-    glmnet(y ~ ., df3, use.model.frame=TRUE), 
+    glmnet(y ~ ., df1, use.model.frame=TRUE),
+    glmnet(y ~ ., df1, use.model.frame=FALSE),
+    glmnet(y ~ ., df2, use.model.frame=TRUE),
+    glmnet(y ~ ., df2, use.model.frame=FALSE),
+    glmnet(y ~ ., df3, use.model.frame=TRUE),
     glmnet(y ~ ., df3, use.model.frame=FALSE),
-    times=10 
+    times=10
 )
 print(res, unit="s", digits=2)
 ```
@@ -186,7 +186,7 @@ leukMod
 `cva.glmnet` uses the algorithm described in the help for `cv.glmnet`, which is to fix the distribution of observations across folds and then call `cv.glmnet` in a loop with different values of $\alpha$. Optionally, you can parallelise this outer loop, by setting the `outerParallel` argument to a non-NULL value. Currently, glmnetUtils supports the following methods of parallelisation:
 
 - Via `parLapply` in the parallel package. To use this, set `outerParallel` to a valid cluster object created by `makeCluster`. 
-- Via `rxExec` as supplied by [Microsoft R Server's](https://www.microsoft.com/en-au/sql-server/machine-learning-server) RevoScaleR package. To use this, set `outerParallel` to a valid compute context created by `RxComputeContext`, or a character string specifying such a context. 
+- Via `rxExec` as supplied by the (now retired) RevoScaleR package from Microsoft R Server. To use this, set `outerParallel` to a valid compute context created by `RxComputeContext`, or a character string specifying such a context. 
 
 If the outer loop is run in parallel, `cva.glmnet` can check if the inner loop (over $\lambda$) is also set to run in parallel, and disable this if it would lead to contention for cores.
 
