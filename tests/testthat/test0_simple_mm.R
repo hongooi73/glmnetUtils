@@ -43,6 +43,7 @@ test_that("optional arguments work",
 
 test_that("factor handling works",
 {
+    skip_if_not_installed("MASS")
     data(Insurance, package="MASS")
     # don't worry about ordered factors for now
     class(Insurance$Group) <- "factor"
@@ -97,6 +98,7 @@ test_that("nonsyntactic vars work",
 
 test_that("interaction/expression terms work",
 {
+    skip_if_not_installed("MASS")
     data(Insurance, package="MASS")
     xy1 <- simple_mf(Claims / Holders ~ District * Group + Age, data=Insurance)
     expect_is(xy1$x, "matrix")

@@ -30,6 +30,7 @@ test_that("glmnet arguments work", {
     expect_equivalent(mod00$beta, mod0$beta)
     expect_equivalent(mod0$beta, mod1$beta)
 
+    skip_if_not_installed("MASS")
     data(Insurance, package="MASS")
     # don't worry about ordered factors for now
     class(Insurance$Group) <- "factor"
@@ -82,6 +83,7 @@ test_that("predict and coef work", {
 
 
 test_that("prediction with NA works", {
+    skip_if_not_installed("MASS")
     data(Boston, package="MASS")
     BostonNA <- Boston
     BostonNA[1, ] <- NA
